@@ -40,6 +40,7 @@ import PhotoUpload from "@/components/PhotoUpload";
 import SpellChecker from "@/components/SpellChecker";
 import CVEnhancedBuilder from "@/components/CVEnhancedBuilder";
 import CVInlineEditor from "@/components/CVInlineEditor";
+import SpacingControls from "@/components/SpacingControls";
 import { ProgressIndicator } from "@/components/ProgressIndicator";
 import { useAutoSave } from "@/hooks/useAutoSave";
 import { toastActions } from "@/components/EnhancedToast";

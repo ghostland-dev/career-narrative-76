@@ -33,6 +33,17 @@ interface Education {
   description: string;
 }
 
+interface SpacingSettings {
+  pageMargin: number;
+  sectionSpacing: number;
+  itemSpacing: number;
+  lineHeight: number;
+  headerPadding: number;
+  contentPadding: number;
+  borderRadius: number;
+  fontSize: number;
+}
+
 interface CVDisplayProps {
   personalInfo: PersonalInfo;
   experience: Experience[];
@@ -43,6 +54,7 @@ interface CVDisplayProps {
   certifications?: Array<{ id: string; name: string; issuer: string; date: string; url?: string; }>;
   projects?: Array<{ id: string; name: string; description: string; technologies: string; url?: string; date: string; }>;
   templateStyle?: "modern" | "classic" | "minimal" | "print";
+  spacingSettings?: SpacingSettings;
 }
 
 const CVDisplay: React.FC<CVDisplayProps> = ({
@@ -54,8 +66,22 @@ const CVDisplay: React.FC<CVDisplayProps> = ({
   interests = [],
   certifications = [],
   projects = [],
-  templateStyle = "modern"
+  templateStyle = "modern",
+  spacingSettings
 }) => {
+  // Paramètres par défaut
+  const defaultSpacing: SpacingSettings = {
+    pageMargin: 32,
+    sectionSpacing: 24,
+    itemSpacing: 16,
+    lineHeight: 1.5,
+    headerPadding: 16,
+    contentPadding: 16,
+    borderRadius: 8,
+    fontSize: 14
+  };
+
+  const spacing = spacingSettings || defaultSpacing;
   const formatDate = (dateString: string) => {
     if (!dateString) return "Présent";
     const date = new Date(dateString);
@@ -81,10 +107,25 @@ const CVDisplay: React.FC<CVDisplayProps> = ({
     : "border-b-2 border-primary";
 
   return (
-    <div className="w-full mx-auto bg-white text-black p-4 md:p-6 lg:p-8 print:p-4 print:m-0 print:max-w-none print:w-auto print:break-inside-avoid"
-         style={{ minHeight: templateStyle === "print" ? "297mm" : "auto", maxWidth: templateStyle === "print" ? "210mm" : "none" }}>
+    <div 
+      className="w-full mx-auto bg-white text-black print:m-0 print:max-w-none print:w-auto print:break-inside-avoid"
+      style={{ 
+        minHeight: templateStyle === "print" ? "297mm" : "auto", 
+        maxWidth: templateStyle === "print" ? "210mm" : "none",
+        padding: `${spacing.pageMargin}px`,
+        fontSize: `${spacing.fontSize}px`,
+        lineHeight: spacing.lineHeight
+      }}
+    >
       {/* En-tête optimisé */}
-      <header className={`${templateStyle === "modern" ? "bg-gradient-to-r from-primary/5 to-primary/10" : ""} p-4 mb-4 rounded-lg print:break-inside-avoid`}>
+      <header 
+        className={`${templateStyle === "modern" ? "bg-gradient-to-r from-primary/5 to-primary/10" : ""} print:break-inside-avoid`}
+        style={{ 
+          padding: `${spacing.headerPadding}px`,
+          marginBottom: `${spacing.sectionSpacing}px`,
+          borderRadius: `${spacing.borderRadius}px`
+        }}
+      >
         {/* Layout avec photo */}
         <div className="flex items-start gap-6 mb-4">
           {/* Photo de profil */}
@@ -152,7 +193,10 @@ const CVDisplay: React.FC<CVDisplayProps> = ({
       </header>
 
       {/* Layout responsive en colonnes */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 print:gap-3">
+      <div 
+        className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 print:gap-3"
+        style={{ gap: `${spacing.sectionSpacing}px` }}
+      >
         {/* Colonne principale (responsive) */}
         <div className="lg:col-span-2 space-y-4 print:space-y-3">
           {/* Résumé professionnel */}
