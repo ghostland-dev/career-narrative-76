@@ -26,6 +26,7 @@ import { useToast } from "@/hooks/use-toast";
 import { getCV } from "@/lib/cv-service";
 import { exportToPDF } from "@/lib/pdf-export";
 import CVDisplay from "@/components/CVDisplay";
+import SharePanel from "@/components/SharePanel";
 
 const CVPreview = () => {
   const navigate = useNavigate();
@@ -194,18 +195,25 @@ const CVPreview = () => {
             </div>
           </div>
 
-          {/* CV Content - Optimisé pour A4 */}
+          {/* CV Content - Optimisé et flexible */}
           <Card className="border-0 shadow-elegant print:shadow-none">
             <CardContent id="cv-preview-content" className="p-0 print:p-0">
               <CVDisplay
-                personalInfo={personalInfo}
+                personalInfo={{...personalInfo, photo_url: cv.photo_url}}
                 experience={experience}
                 education={education}
                 skills={skills}
+                languages={cv.languages || []}
+                interests={cv.interests || []}
+                certifications={cv.certifications || []}
+                projects={cv.projects || []}
                 templateStyle="modern"
               />
             </CardContent>
           </Card>
+
+          {/* Panel de partage amélioré */}
+          <SharePanel cvId={id!} cvTitle={cv.title} />
 
           {/* Share Section */}
           <Card className="mt-6 border-0 shadow-card">

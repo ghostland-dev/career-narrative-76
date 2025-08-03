@@ -41,7 +41,7 @@ interface CVDisplayProps {
   interests?: string[];
   certifications?: Array<{ id: string; name: string; issuer: string; date: string; url?: string; }>;
   projects?: Array<{ id: string; name: string; description: string; technologies: string; url?: string; date: string; }>;
-  templateStyle?: "modern" | "classic" | "minimal";
+  templateStyle?: "modern" | "classic" | "minimal" | "print";
 }
 
 const CVDisplay: React.FC<CVDisplayProps> = ({
@@ -68,7 +68,8 @@ const CVDisplay: React.FC<CVDisplayProps> = ({
     : "border-b-2 border-primary";
 
   return (
-    <div className="w-full max-w-[210mm] mx-auto bg-white text-black min-h-[297mm] p-6 print:p-4 print:m-0 print:max-w-none print:w-auto print:break-inside-avoid">
+    <div className="w-full mx-auto bg-white text-black p-4 md:p-6 lg:p-8 print:p-4 print:m-0 print:max-w-none print:w-auto print:break-inside-avoid"
+         style={{ minHeight: templateStyle === "print" ? "297mm" : "auto", maxWidth: templateStyle === "print" ? "210mm" : "none" }}>
       {/* En-tête optimisé */}
       <header className={`${templateStyle === "modern" ? "bg-gradient-to-r from-primary/5 to-primary/10" : ""} p-4 mb-4 rounded-lg print:break-inside-avoid`}>
         {/* Layout avec photo */}
@@ -132,10 +133,10 @@ const CVDisplay: React.FC<CVDisplayProps> = ({
         </div>
       </header>
 
-      {/* Layout en deux colonnes pour optimiser l'espace */}
-      <div className="grid grid-cols-3 gap-4 print:gap-3">
-        {/* Colonne principale (2/3) */}
-        <div className="col-span-2 space-y-4 print:space-y-3">
+      {/* Layout responsive en colonnes */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 print:gap-3">
+        {/* Colonne principale (responsive) */}
+        <div className="lg:col-span-2 space-y-4 print:space-y-3">
           {/* Résumé professionnel */}
           {personalInfo.summary && (
             <section>
@@ -242,8 +243,8 @@ const CVDisplay: React.FC<CVDisplayProps> = ({
           )}
         </div>
 
-        {/* Colonne secondaire (1/3) */}
-        <div className="col-span-1 space-y-4 print:space-y-3">
+        {/* Colonne secondaire (responsive) */}
+        <div className="lg:col-span-1 space-y-4 print:space-y-3">
           {/* Compétences */}
           {skills.length > 0 && (
             <section>
