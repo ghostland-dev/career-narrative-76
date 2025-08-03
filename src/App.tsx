@@ -18,7 +18,7 @@ import Templates from "./pages/Templates";
 import CVPreview from "./pages/CVPreview";
 import Profile from "./pages/Profile";
 import Support from "./pages/Support";
-import Admin from "./pages/Admin";
+import NewCV from "./pages/NewCV";
 import Subscription from "./pages/Subscription";
 
 const queryClient = new QueryClient({
@@ -95,11 +95,6 @@ const App = () => {
                   <Route path="/support" element={
                     <ErrorBoundary>
                       <Support />
-                    </ErrorBoundary>
-                  } />
-                  <Route path="/admin" element={
-                    <ErrorBoundary>
-                      <Admin />
                     </ErrorBoundary>
                   } />
                   <Route path="/subscription" element={

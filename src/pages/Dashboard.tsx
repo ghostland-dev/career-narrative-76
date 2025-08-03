@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -213,17 +213,17 @@ const Dashboard = () => {
         <span className="text-sm text-muted-foreground">{user?.email}</span>
       </div>
       <div className="flex items-center space-x-2">
-        <Button variant="ghost" size="sm" onClick={() => navigate("/profile")}>
-          <Settings className="h-4 w-4 mr-2" />
-          Profil
+        <Button variant="ghost" size="sm" asChild>
+          <Link to="/profile">
+            <Settings className="h-4 w-4 mr-2" />
+            Profil
+          </Link>
         </Button>
-        <Button variant="ghost" size="sm" onClick={() => navigate("/support")}>
-          <HelpCircle className="h-4 w-4 mr-2" />
-          Aide
-        </Button>
-        <Button variant="outline" size="sm" onClick={handleSignOut}>
-          <LogOut className="h-4 w-4 mr-2" />
-          Déconnexion
+        <Button variant="ghost" size="sm" asChild>
+          <Link to="/support">
+            <HelpCircle className="h-4 w-4 mr-2" />
+            Aide
+          </Link>
         </Button>
       </div>
     </div>

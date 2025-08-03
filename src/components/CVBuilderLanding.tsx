@@ -23,8 +23,8 @@ const CVBuilderLanding = () => {
             <a href="#pricing" className="text-muted-foreground hover:text-foreground transition-smooth">Tarifs</a>
           </div>
           <div className="flex items-center space-x-3">
-            <Button variant="ghost" onClick={() => window.location.href = "/auth"}>Connexion</Button>
-            <Button variant="hero" size="sm" onClick={() => window.location.href = "/auth"}>Essayer gratuitement</Button>
+            <Button variant="ghost" onClick={() => navigate("/auth")}>Connexion</Button>
+            <Button variant="hero" size="sm" onClick={() => navigate("/auth")}>Essayer gratuitement</Button>
           </div>
         </div>
       </nav>
