@@ -1,14 +1,17 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
-
 User-agent: *
 Allow: /
+
+# Sitemaps
+Sitemap: https://cvcraft.lovable.app/sitemap.xml
+
+# Allow all important pages
+Allow: /cv-public/
+Allow: /templates/
+Allow: /auth/
+
+# Disallow admin areas (if any)
+Disallow: /admin/
+Disallow: /api/
+
+# Crawl delay
+Crawl-delay: 1

@@ -1,7 +1,7 @@
 {
-  "name": "CV Builder Pro",
-  "short_name": "CV Builder",
-  "description": "Créez votre CV professionnel en quelques minutes",
+  "name": "CVCraft - Créateur de CV Professionnel",
+  "short_name": "CVCraft",
+  "description": "Créez votre CV professionnel en quelques minutes avec IA",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -10,7 +10,7 @@
   "icons": [
     {
       "src": "/favicon.ico",
-      "sizes": "16x16 32x32",
+      "sizes": "16x16 32x32 48x48",
       "type": "image/x-icon"
     },
     {
@@ -27,18 +27,21 @@
     }
   ],
   "categories": ["business", "productivity", "utilities"],
+  "lang": "fr",
   "screenshots": [
     {
       "src": "/placeholder.svg",
       "sizes": "1280x720",
       "type": "image/svg+xml",
-      "form_factor": "wide"
+      "form_factor": "wide",
+      "label": "CVCraft - Vue desktop"
     },
     {
       "src": "/placeholder.svg",
       "sizes": "360x640",
-      "type": "image/svg+xml",
-      "form_factor": "narrow"
+      "type": "image/svg+xml", 
+      "form_factor": "narrow",
+      "label": "CVCraft - Vue mobile"
     }
   ]
 }
