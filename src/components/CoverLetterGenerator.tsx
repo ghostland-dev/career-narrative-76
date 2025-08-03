@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Sparkles, FileText, Download, Loader2 } from 'lucide-react';
+import { Sparkles, FileText, Download, Loader2, Mail, Phone, MapPin } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -83,6 +83,18 @@ const CoverLetterGenerator: React.FC<CoverLetterGeneratorProps> = ({ cv, isOpen,
     setJobDescription('');
     setGeneratedLetter('');
     setLetterType('spontaneous');
+  };
+
+  const calculateAge = (birthDate: string) => {
+    if (!birthDate) return null;
+    const today = new Date();
+    const birth = new Date(birthDate);
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+      age--;
+    }
+    return age;
   };
 
   return (
@@ -207,10 +219,96 @@ const CoverLetterGenerator: React.FC<CoverLetterGeneratorProps> = ({ cv, isOpen,
                 </div>
               </div>
               
-              <Card>
+              <Card className="w-full bg-white">
                 <CardContent className="p-6">
-                  <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                    {generatedLetter}
+                  {/* En-tête avec le même style que le CV */}
+                  <header className="bg-gradient-to-r from-primary/5 to-primary/10 p-4 mb-6 rounded-lg">
+                    <div className="flex items-start gap-6 mb-4">
+                      {/* Photo de profil */}
+                      {cv.photo_url && (
+                        <div className="flex-shrink-0">
+                          <img
+                            src={cv.photo_url}
+                            alt="Photo de profil"
+                            className="w-16 h-16 rounded-full object-cover border-4 border-primary/20"
+                          />
+                        </div>
+                      )}
+                      
+                      {/* Informations principales */}
+                      <div className="flex-1">
+                        <h1 className="text-2xl font-bold text-gray-900 mb-1 tracking-tight">
+                          {cv.personal_info?.fullName || "Nom non renseigné"}
+                          {cv.personal_info?.birthDate && (
+                            <span className="text-base font-normal text-gray-600 ml-2">
+                              ({calculateAge(cv.personal_info.birthDate)} ans)
+                            </span>
+                          )}
+                        </h1>
+                        
+                        {/* Informations de contact */}
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600 mt-2">
+                          {cv.personal_info?.email && (
+                            <div className="flex items-center">
+                              <Mail className="h-3 w-3 mr-1 text-primary" />
+                              <span>{cv.personal_info.email}</span>
+                            </div>
+                          )}
+                          {cv.personal_info?.phone && (
+                            <div className="flex items-center">
+                              <Phone className="h-3 w-3 mr-1 text-primary" />
+                              <span>{cv.personal_info.phone}</span>
+                            </div>
+                          )}
+                          {cv.personal_info?.address && (
+                            <div className="flex items-center">
+                              <MapPin className="h-3 w-3 mr-1 text-primary" />
+                              <span>{cv.personal_info.address}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </header>
+
+                  {/* Date et lieu */}
+                  <div className="text-right text-sm text-gray-600 mb-6">
+                    {cv.personal_info?.address && cv.personal_info.address.split(',')[0]}, le {new Date().toLocaleDateString('fr-FR')}
+                  </div>
+
+                  {/* Informations destinataire (si lettre ciblée) */}
+                  {letterType === 'targeted' && company && (
+                    <div className="mb-6 text-sm text-gray-700">
+                      <div className="font-medium">{company}</div>
+                      {jobTitle && <div>Service Ressources Humaines</div>}
+                    </div>
+                  )}
+
+                  {/* Objet */}
+                  <div className="mb-6">
+                    <span className="font-medium text-sm text-gray-700">
+                      Objet : {letterType === 'targeted' && jobTitle ? `Candidature pour le poste de ${jobTitle}` : 'Candidature spontanée'}
+                    </span>
+                  </div>
+
+                  {/* Contenu de la lettre */}
+                  <div className="text-sm leading-relaxed text-gray-800 mb-6">
+                    <div className="mb-4">
+                      {letterType === 'targeted' ? 'Madame, Monsieur,' : 'Madame, Monsieur,'}
+                    </div>
+                    
+                    <div className="whitespace-pre-wrap">
+                      {generatedLetter}
+                    </div>
+                    
+                    <div className="mt-4">
+                      Dans l'attente de votre retour, je vous prie d'agréer, Madame, Monsieur, l'expression de mes salutations distinguées.
+                    </div>
+                  </div>
+
+                  {/* Signature */}
+                  <div className="text-right text-sm text-gray-700">
+                    <div>{cv.personal_info?.fullName}</div>
                   </div>
                 </CardContent>
               </Card>
