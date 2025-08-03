@@ -24,7 +24,7 @@ import {
 interface DesignSystemProps {
   onFontChange: (font: string) => void;
   onColorChange: (colors: ColorPalette) => void;
-  onSpacingChange: (spacing: SpacingControls) => void;
+  onSpacingChange: (spacing: SpacingSettings) => void;
 }
 
 interface ColorPalette {
@@ -36,11 +36,15 @@ interface ColorPalette {
   muted: string;
 }
 
-interface SpacingControls {
-  margin: number;
-  padding: number;
+interface SpacingSettings {
+  pageMargin: number;
+  sectionSpacing: number;
+  itemSpacing: number;
   lineHeight: number;
-  letterSpacing: number;
+  headerPadding: number;
+  contentPadding: number;
+  borderRadius: number;
+  fontSize: number;
 }
 
 const googleFonts = [
@@ -108,11 +112,15 @@ const DesignSystem: React.FC<DesignSystemProps> = ({
 }) => {
   const [selectedFont, setSelectedFont] = useState("Inter");
   const [customColors, setCustomColors] = useState<ColorPalette>(colorPalettes[0].colors);
-  const [spacing, setSpacing] = useState<SpacingControls>({
-    margin: 16,
-    padding: 12,
+  const [spacing, setSpacing] = useState<SpacingSettings>({
+    pageMargin: 32,
+    sectionSpacing: 24,
+    itemSpacing: 16,
     lineHeight: 1.5,
-    letterSpacing: 0
+    headerPadding: 16,
+    contentPadding: 16,
+    borderRadius: 8,
+    fontSize: 14
   });
 
   const handleFontChange = (font: string) => {
@@ -133,7 +141,7 @@ const DesignSystem: React.FC<DesignSystemProps> = ({
     onColorChange(palette);
   };
 
-  const handleSpacingChange = (key: keyof SpacingControls, value: number) => {
+  const handleSpacingChange = (key: keyof SpacingSettings, value: number) => {
     const newSpacing = { ...spacing, [key]: value };
     setSpacing(newSpacing);
     onSpacingChange(newSpacing);
@@ -285,10 +293,10 @@ const DesignSystem: React.FC<DesignSystemProps> = ({
           <TabsContent value="spacing" className="space-y-4">
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label>Marges externes ({spacing.margin}px)</Label>
+                <Label>Marges externes ({spacing.pageMargin}px)</Label>
                 <Slider
-                  value={[spacing.margin]}
-                  onValueChange={([value]) => handleSpacingChange('margin', value)}
+                  value={[spacing.pageMargin]}
+                  onValueChange={([value]) => handleSpacingChange('pageMargin', value)}
                   max={50}
                   min={0}
                   step={2}
@@ -296,11 +304,11 @@ const DesignSystem: React.FC<DesignSystemProps> = ({
               </div>
               
               <div className="space-y-2">
-                <Label>Padding interne ({spacing.padding}px)</Label>
+                <Label>Espacement sections ({spacing.sectionSpacing}px)</Label>
                 <Slider
-                  value={[spacing.padding]}
-                  onValueChange={([value]) => handleSpacingChange('padding', value)}
-                  max={30}
+                  value={[spacing.sectionSpacing]}
+                  onValueChange={([value]) => handleSpacingChange('sectionSpacing', value)}
+                  max={50}
                   min={0}
                   step={1}
                 />
@@ -318,13 +326,13 @@ const DesignSystem: React.FC<DesignSystemProps> = ({
               </div>
               
               <div className="space-y-2">
-                <Label>Espacement des lettres ({spacing.letterSpacing}px)</Label>
+                <Label>Taille de police ({spacing.fontSize}px)</Label>
                 <Slider
-                  value={[spacing.letterSpacing]}
-                  onValueChange={([value]) => handleSpacingChange('letterSpacing', value)}
-                  max={2}
-                  min={-1}
-                  step={0.1}
+                  value={[spacing.fontSize]}
+                  onValueChange={([value]) => handleSpacingChange('fontSize', value)}
+                  max={20}
+                  min={10}
+                  step={1}
                 />
               </div>
             </div>

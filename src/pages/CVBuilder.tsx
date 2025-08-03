@@ -60,6 +60,17 @@ const CVBuilder = () => {
   const [autoSaveEnabled, setAutoSaveEnabled] = useState(true);
   const [templateStyle, setTemplateStyle] = useState<"modern" | "classic" | "minimal" | "print" | "creative" | "professional" | "elegant" | "tech">("modern");
   
+  // Design system state
+  const [currentFont, setCurrentFont] = useState("Inter");
+  const [colorPalette, setColorPalette] = useState({
+    primary: "#2563eb",
+    secondary: "#64748b", 
+    accent: "#0ea5e9",
+    text: "#1e293b",
+    background: "#ffffff",
+    muted: "#f1f5f9"
+  });
+  
   // Spacing settings
   const [spacingSettings, setSpacingSettings] = useState({
     pageMargin: 32,
@@ -855,18 +866,9 @@ const CVBuilder = () => {
                     
                     {/* Design System */}
                     <DesignSystem 
-                      onFontChange={(font) => {
-                        // Appliquer la police au CV
-                        console.log("Font changed:", font);
-                      }}
-                      onColorChange={(colors) => {
-                        // Appliquer les couleurs au CV
-                        console.log("Colors changed:", colors);
-                      }}
-                      onSpacingChange={(spacing) => {
-                        // Appliquer l'espacement au CV
-                        console.log("Spacing changed:", spacing);
-                      }}
+                      onFontChange={(font) => setCurrentFont(font)}
+                      onColorChange={(colors) => setColorPalette(colors)}
+                      onSpacingChange={(spacing) => setSpacingSettings(spacing)}
                     />
                     
                     <Separator className="my-6" />
@@ -963,6 +965,7 @@ const CVBuilder = () => {
                   projects={cvData.projects}
                   templateStyle={templateStyle}
                   spacingSettings={spacingSettings}
+                  designSystem={{ font: currentFont, colors: colorPalette }}
                 />
               </div>
             </div>

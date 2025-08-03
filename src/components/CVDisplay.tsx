@@ -55,6 +55,7 @@ interface CVDisplayProps {
   projects?: Array<{ id: string; name: string; description: string; technologies: string; url?: string; date: string; }>;
   templateStyle?: "modern" | "classic" | "minimal" | "print" | "creative" | "professional" | "elegant" | "tech";
   spacingSettings?: SpacingSettings;
+  designSystem?: { font: string; colors: { primary: string; secondary: string; accent: string; text: string; background: string; muted: string; } };
 }
 
 const CVDisplay: React.FC<CVDisplayProps> = ({
@@ -67,7 +68,8 @@ const CVDisplay: React.FC<CVDisplayProps> = ({
   certifications = [],
   projects = [],
   templateStyle = "modern",
-  spacingSettings
+  spacingSettings,
+  designSystem
 }) => {
   // Paramètres par défaut
   const defaultSpacing: SpacingSettings = {
@@ -175,7 +177,10 @@ const CVDisplay: React.FC<CVDisplayProps> = ({
         maxWidth: templateStyle === "print" ? "210mm" : "none",
         padding: `${spacing.pageMargin}px`,
         fontSize: `${spacing.fontSize}px`,
-        lineHeight: spacing.lineHeight
+        lineHeight: spacing.lineHeight,
+        fontFamily: designSystem?.font || 'Inter',
+        backgroundColor: designSystem?.colors.background || '#ffffff',
+        color: designSystem?.colors.text || '#1e293b'
       }}
     >
       {/* En-tête optimisé */}
