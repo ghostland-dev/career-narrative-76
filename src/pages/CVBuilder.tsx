@@ -1,12 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Separator } from "@/components/ui/separator";
 import { 
   FileText, 
   Save, 
@@ -45,7 +43,6 @@ import TemplateSelector from "@/components/TemplateSelector";
 import DesignSystem from "@/components/DesignSystem";
 import DesignCustomizer from "@/components/DesignCustomizer";
 import CVSectionManager from "@/components/CVSectionManager";
-import { ProgressIndicator } from "@/components/ProgressIndicator";
 import { useAutoSave } from "@/hooks/useAutoSave";
 import { toastActions } from "@/components/EnhancedToast";
 
@@ -239,11 +236,11 @@ const CVBuilder = () => {
       education: parsedData.education || [],
       skills: parsedData.skills || [],
       languages: [],
-        interests: [],
-        certifications: [],
-        projects: [],
-        photo_url: undefined,
-        cvSections: []
+      interests: [],
+      certifications: [],
+      projects: [],
+      photo_url: undefined,
+      cvSections: []
     });
     toastActions.importSuccess();
   };
@@ -514,444 +511,182 @@ const CVBuilder = () => {
               </CardContent>
             </Card>
 
-            {/* Compact Tabs */}
-            <div className="bg-card rounded-lg p-2 mb-6 border">
-              <div className="flex flex-wrap gap-1">
-                {[
-                  { id: 'personal', icon: User, label: 'Personnel' },
-                  { id: 'experience', icon: Briefcase, label: 'Expérience' },
-                  { id: 'education', icon: GraduationCap, label: 'Formation' },
-                  { id: 'skills', icon: Award, label: 'Compétences' },
-                  { id: 'sections', icon: Plus, label: 'Sections' },
-                  { id: 'review', icon: Wand2, label: 'Design' }
-                ].map((tab) => (
-                  <Button
-                    key={tab.id}
-                    variant={currentTab === tab.id ? "default" : "ghost"}
-                    size="sm"
-                    onClick={() => setCurrentTab(tab.id)}
-                    className="text-xs"
-                  >
-                    <tab.icon className="h-3 w-3 mr-1" />
-                    {tab.label}
-                  </Button>
-                ))}
-              </div>
-            </div>
-                    <TabsTrigger value="personal" className="text-sm font-medium">
-                      <User className="h-4 w-4 mr-2" />
-                      Personnel
-                    </TabsTrigger>
-                    <TabsTrigger value="experience" className="text-sm font-medium">
-                      <Briefcase className="h-4 w-4 mr-2" />
-                      Expérience
-                    </TabsTrigger>
-                    <TabsTrigger value="education" className="text-sm font-medium">
-                      <GraduationCap className="h-4 w-4 mr-2" />
-                      Formation
-                    </TabsTrigger>
-                    <TabsTrigger value="skills" className="text-sm font-medium">
-                      <Award className="h-4 w-4 mr-2" />
-                      Compétences
-                    </TabsTrigger>
-                    <TabsTrigger value="sections" className="text-sm font-medium">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Sections
-                    </TabsTrigger>
-                    <TabsTrigger value="review" className="text-sm font-medium">
-                      <Wand2 className="h-4 w-4 mr-2" />
-                      Révision
-                    </TabsTrigger>
-                  </TabsList>
-
-                  <TabsContent value="personal" className="space-y-6">
-                    <div className="grid grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <Label htmlFor="fullName">Nom complet</Label>
-                        <Input
-                          id="fullName"
-                          value={cvData.fullName}
-                          onChange={(e) => setCvData(prev => ({
-                            ...prev,
-                            fullName: e.target.value
-                          }))}
-                          placeholder="Jean Dupont"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="email">Email</Label>
-                        <Input
-                          id="email"
-                          type="email"
-                          value={cvData.email}
-                          onChange={(e) => setCvData(prev => ({
-                            ...prev,
-                            email: e.target.value
-                          }))}
-                          placeholder="jean.dupont@email.com"
-                        />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-3 gap-6">
-                      <div className="space-y-2">
-                        <Label htmlFor="phone">Téléphone</Label>
-                        <Input
-                          id="phone"
-                          value={cvData.phone}
-                          onChange={(e) => setCvData(prev => ({
-                            ...prev,
-                            phone: e.target.value
-                          }))}
-                          placeholder="+33 1 23 45 67 89"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="address">Adresse</Label>
-                        <Input
-                          id="address"
-                          value={cvData.address}
-                          onChange={(e) => setCvData(prev => ({
-                            ...prev,
-                            address: e.target.value
-                          }))}
-                          placeholder="Paris, France"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="birthDate">Date de naissance</Label>
-                        <Input
-                          id="birthDate"
-                          type="date"
-                          value={cvData.birthDate}
-                          onChange={(e) => setCvData(prev => ({
-                            ...prev,
-                            birthDate: e.target.value
-                          }))}
-                        />
-                      </div>
-                    </div>
+            {/* Content based on current tab */}
+            {currentTab === 'personal' && (
+              <Card className="border-0 shadow-card">
+                <CardContent className="p-6 space-y-6">
+                  <div className="grid grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <Label htmlFor="summary">Résumé professionnel</Label>
-                      <Textarea
-                        id="summary"
-                        value={cvData.summary}
+                      <Label htmlFor="fullName">Nom complet</Label>
+                      <Input
+                        id="fullName"
+                        value={cvData.fullName}
                         onChange={(e) => setCvData(prev => ({
                           ...prev,
-                          summary: e.target.value
+                          fullName: e.target.value
                         }))}
-                        placeholder="Décrivez brièvement votre profil professionnel..."
-                        rows={4}
-                        className="resize-none"
+                        placeholder="Jean Dupont"
                       />
                     </div>
-                  </TabsContent>
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={cvData.email}
+                        onChange={(e) => setCvData(prev => ({
+                          ...prev,
+                          email: e.target.value
+                        }))}
+                        placeholder="jean.dupont@email.com"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="summary">Résumé professionnel</Label>
+                    <Textarea
+                      id="summary"
+                      value={cvData.summary}
+                      onChange={(e) => setCvData(prev => ({
+                        ...prev,
+                        summary: e.target.value
+                      }))}
+                      placeholder="Décrivez brièvement votre profil..."
+                      rows={3}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
-                  <TabsContent value="experience" className="space-y-6">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-semibold">Expérience professionnelle</h3>
-                      <Button size="sm" onClick={addExperience} className="animate-scale-in">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Ajouter
-                      </Button>
-                    </div>
-                    
-                    <div className="space-y-6">
-                      {cvData.experience.map((exp, index) => (
-                        <Card key={exp.id} className="border border-border/50 p-6 hover:shadow-card transition-smooth">
-                          <div className="flex items-center justify-between mb-4">
-                            <span className="text-sm font-medium text-muted-foreground">
-                              Expérience {index + 1}
-                            </span>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => removeExperience(exp.id)}
-                              className="text-destructive hover:text-destructive"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                          
-                          <div className="grid grid-cols-2 gap-4 mb-4">
-                            <div className="space-y-2">
-                              <Label>Poste</Label>
-                              <Input
-                                value={exp.title}
-                                onChange={(e) => updateExperience(exp.id, "title", e.target.value)}
-                                placeholder="Développeur Frontend"
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label>Entreprise</Label>
-                              <Input
-                                value={exp.company}
-                                onChange={(e) => updateExperience(exp.id, "company", e.target.value)}
-                                placeholder="Tech Company"
-                              />
-                            </div>
-                          </div>
-                          
-                          <div className="grid grid-cols-3 gap-4 mb-4">
-                            <div className="space-y-2">
-                              <Label>Lieu</Label>
-                              <Input
-                                value={exp.location}
-                                onChange={(e) => updateExperience(exp.id, "location", e.target.value)}
-                                placeholder="Paris, France"
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label>Date de début</Label>
-                              <Input
-                                type="month"
-                                value={exp.startDate}
-                                onChange={(e) => updateExperience(exp.id, "startDate", e.target.value)}
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label>Date de fin</Label>
-                              <Input
-                                type="month"
-                                value={exp.endDate}
-                                onChange={(e) => updateExperience(exp.id, "endDate", e.target.value)}
-                                placeholder="Présent"
-                              />
-                            </div>
-                          </div>
-                          
-                          <div className="space-y-2">
-                            <Label>Description</Label>
-                            <Textarea
-                              value={exp.description}
-                              onChange={(e) => updateExperience(exp.id, "description", e.target.value)}
-                              placeholder="Décrivez vos responsabilités et réalisations..."
-                              rows={3}
-                              className="resize-none"
-                            />
-                          </div>
-                        </Card>
-                      ))}
-                      
-                      {cvData.experience.length === 0 && (
-                        <Card className="border-dashed border-2 border-border p-12 text-center">
-                          <Briefcase className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
-                          <h3 className="text-lg font-medium mb-2">Aucune expérience ajoutée</h3>
-                          <p className="text-muted-foreground mb-4">Cliquez sur "Ajouter" pour commencer</p>
-                          <Button onClick={addExperience}>
-                            <Plus className="h-4 w-4 mr-2" />
-                            Ajouter une expérience
-                          </Button>
-                        </Card>
-                      )}
-                    </div>
-                  </TabsContent>
-
-                  <TabsContent value="education" className="space-y-6">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-semibold">Formation</h3>
-                      <Button size="sm" onClick={addEducation} className="animate-scale-in">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Ajouter
-                      </Button>
-                    </div>
-                    
-                    <div className="space-y-6">
-                      {cvData.education.map((edu, index) => (
-                        <Card key={edu.id} className="border border-border/50 p-6 hover:shadow-card transition-smooth">
-                          <div className="flex items-center justify-between mb-4">
-                            <span className="text-sm font-medium text-muted-foreground">
-                              Formation {index + 1}
-                            </span>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => removeEducation(edu.id)}
-                              className="text-destructive hover:text-destructive"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                          
-                          <div className="grid grid-cols-2 gap-4 mb-4">
-                            <div className="space-y-2">
-                              <Label>Diplôme</Label>
-                              <Input
-                                value={edu.degree}
-                                onChange={(e) => updateEducation(edu.id, "degree", e.target.value)}
-                                placeholder="Master en Informatique"
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label>Établissement</Label>
-                              <Input
-                                value={edu.institution}
-                                onChange={(e) => updateEducation(edu.id, "institution", e.target.value)}
-                                placeholder="Université de Paris"
-                              />
-                            </div>
-                          </div>
-                          
-                          <div className="grid grid-cols-3 gap-4 mb-4">
-                            <div className="space-y-2">
-                              <Label>Lieu</Label>
-                              <Input
-                                value={edu.location}
-                                onChange={(e) => updateEducation(edu.id, "location", e.target.value)}
-                                placeholder="Paris, France"
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label>Date de début</Label>
-                              <Input
-                                type="month"
-                                value={edu.startDate}
-                                onChange={(e) => updateEducation(edu.id, "startDate", e.target.value)}
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label>Date de fin</Label>
-                              <Input
-                                type="month"
-                                value={edu.endDate}
-                                onChange={(e) => updateEducation(edu.id, "endDate", e.target.value)}
-                              />
-                            </div>
-                          </div>
-                          
-                          <div className="space-y-2">
-                            <Label>Description</Label>
-                            <Textarea
-                              value={edu.description}
-                              onChange={(e) => updateEducation(edu.id, "description", e.target.value)}
-                              placeholder="Spécialisations, mentions, projets..."
-                              rows={2}
-                              className="resize-none"
-                            />
-                          </div>
-                        </Card>
-                      ))}
-                      
-                      {cvData.education.length === 0 && (
-                        <Card className="border-dashed border-2 border-border p-12 text-center">
-                          <GraduationCap className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
-                          <h3 className="text-lg font-medium mb-2">Aucune formation ajoutée</h3>
-                          <p className="text-muted-foreground mb-4">Cliquez sur "Ajouter" pour commencer</p>
-                          <Button onClick={addEducation}>
-                            <Plus className="h-4 w-4 mr-2" />
-                            Ajouter une formation
-                          </Button>
-                        </Card>
-                      )}
-                    </div>
-                  </TabsContent>
-
-                  <TabsContent value="skills" className="space-y-6">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-semibold">Compétences</h3>
-                    </div>
-                    
-                    <div className="space-y-4">
-                      <div className="flex items-center space-x-2">
-                        <Input
-                          value={newSkill}
-                          onChange={(e) => setNewSkill(e.target.value)}
-                          placeholder="Ajouter une compétence..."
-                          onKeyPress={(e) => e.key === 'Enter' && addSkill()}
-                          className="flex-1"
-                        />
-                        <Button onClick={addSkill} disabled={!newSkill.trim()}>
-                          <Plus className="h-4 w-4 mr-2" />
-                          Ajouter
+            {currentTab === 'experience' && (
+              <Card className="border-0 shadow-card">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-semibold">Expérience professionnelle</h3>
+                    <Button size="sm" onClick={addExperience}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Ajouter
+                    </Button>
+                  </div>
+                  <div className="space-y-4 max-h-96 overflow-y-auto">
+                    {cvData.experience.map((exp, index) => (
+                      <div key={exp.id} className="border rounded-lg p-4">
+                        <div className="grid grid-cols-2 gap-3 mb-3">
+                          <Input
+                            value={exp.title}
+                            onChange={(e) => updateExperience(exp.id, "title", e.target.value)}
+                            placeholder="Poste"
+                            className="text-sm"
+                          />
+                          <Input
+                            value={exp.company}
+                            onChange={(e) => updateExperience(exp.id, "company", e.target.value)}
+                            placeholder="Entreprise"
+                            className="text-sm"
+                          />
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeExperience(exp.id)}
+                          className="text-destructive"
+                        >
+                          <Trash2 className="h-3 w-3 mr-1" />
+                          Supprimer
                         </Button>
                       </div>
-                      
-                      {cvData.skills.length > 0 ? (
-                        <div className="flex flex-wrap gap-2">
-                          {cvData.skills.map((skill, index) => (
-                            <div
-                              key={index}
-                              className="flex items-center space-x-2 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium animate-scale-in"
-                              style={{ animationDelay: `${index * 0.1}s` }}
-                            >
-                              <span>{skill}</span>
-                              <button
-                                onClick={() => removeSkill(skill)}
-                                className="text-primary hover:text-destructive transition-colors"
-                              >
-                                <Trash2 className="h-3 w-3" />
-                              </button>
-                            </div>
-                          ))}
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {currentTab === 'education' && (
+              <Card className="border-0 shadow-card">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-semibold">Formation</h3>
+                    <Button size="sm" onClick={addEducation}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Ajouter
+                    </Button>
+                  </div>
+                  <div className="space-y-4 max-h-96 overflow-y-auto">
+                    {cvData.education.map((edu, index) => (
+                      <div key={edu.id} className="border rounded-lg p-4">
+                        <div className="grid grid-cols-2 gap-3 mb-3">
+                          <Input
+                            value={edu.degree}
+                            onChange={(e) => updateEducation(edu.id, "degree", e.target.value)}
+                            placeholder="Diplôme"
+                            className="text-sm"
+                          />
+                          <Input
+                            value={edu.institution}
+                            onChange={(e) => updateEducation(edu.id, "institution", e.target.value)}
+                            placeholder="Établissement"
+                            className="text-sm"
+                          />
                         </div>
-                      ) : (
-                        <Card className="border-dashed border-2 border-border p-12 text-center">
-                          <Award className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
-                          <h3 className="text-lg font-medium mb-2">Aucune compétence ajoutée</h3>
-                          <p className="text-muted-foreground">Ajoutez vos compétences techniques et soft skills</p>
-                        </Card>
-                      )}
-                    </div>
-                  </TabsContent>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeEducation(edu.id)}
+                          className="text-destructive"
+                        >
+                          <Trash2 className="h-3 w-3 mr-1" />
+                          Supprimer
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
-                  <TabsContent value="sections" className="space-y-6">
-                    <CVSectionManager
-                      sections={cvData.cvSections || []}
-                      onSectionsChange={(sections) => setCvData(prev => ({
-                        ...prev,
-                        cvSections: sections
-                      }))}
+            {currentTab === 'skills' && (
+              <Card className="border-0 shadow-card">
+                <CardContent className="p-6">
+                  <div className="flex gap-2 mb-4">
+                    <Input
+                      value={newSkill}
+                      onChange={(e) => setNewSkill(e.target.value)}
+                      placeholder="Nouvelle compétence..."
+                      onKeyPress={(e) => e.key === 'Enter' && addSkill()}
                     />
-                  </TabsContent>
+                    <Button onClick={addSkill} disabled={!newSkill.trim()}>
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {cvData.skills.map((skill, index) => (
+                      <div key={index} className="flex items-center bg-primary/10 text-primary px-2 py-1 rounded text-sm">
+                        <span>{skill}</span>
+                        <button onClick={() => removeSkill(skill)} className="ml-2 text-xs">×</button>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
-                  <TabsContent value="additional" className="space-y-6">
-                    <CVEnhancedBuilder cvData={cvData} setCvData={setCvData} />
-                  </TabsContent>
+            {currentTab === 'sections' && (
+              <CVSectionManager
+                sections={cvData.cvSections || []}
+                onSectionsChange={(sections) => setCvData(prev => ({
+                  ...prev,
+                  cvSections: sections
+                }))}
+              />
+            )}
 
-                  <TabsContent value="review" className="space-y-6">
-                    <div className="text-center mb-6">
-                      <h3 className="text-lg font-semibold mb-2">Design et personnalisation</h3>
-                      <p className="text-muted-foreground">
-                        Personnalisez l'apparence et le style de votre CV
-                      </p>
-                    </div>
-                    
-                    {/* New Advanced Design Customizer */}
-                    <DesignCustomizer
-                      settings={designSettings}
-                      onSettingsChange={setDesignSettings}
-                    />
-                    
-                    <Separator className="my-6" />
-                    
-                    {/* Quick Template Selector */}
-                    <TemplateSelector 
-                      currentTemplate={templateStyle}
-                      onTemplateChange={(template) => setTemplateStyle(template as any)}
-                    />
-                    
-                    <Separator className="my-6" />
-                    
-                    {/* Spell Checker */}
-                    <div className="space-y-4">
-                      <h4 className="text-md font-semibold flex items-center">
-                        <Edit3 className="h-5 w-5 mr-2 text-primary" />
-                        Vérification orthographique
-                      </h4>
-                      <SpellChecker 
-                        text={`${cvData.fullName} ${cvData.summary} ${cvData.experience.map(exp => `${exp.title} ${exp.description}`).join(' ')} ${cvData.education.map(edu => `${edu.degree} ${edu.description}`).join(' ')}`}
-                        onCorrectedText={(correctedText) => {
-                          toast({
-                            title: "Corrections appliquées",
-                            description: "Consultez les modifications dans les sections correspondantes.",
-                          });
-                        }}
-                      />
-                    </div>
-                  </TabsContent>
-                </Tabs>
-              </div>
-            </Card>
-
+            {currentTab === 'review' && (
+              <DesignCustomizer
+                settings={designSettings}
+                onSettingsChange={setDesignSettings}
+              />
+            )}
           </div>
 
           {/* Preview Panel */}
@@ -967,11 +702,6 @@ const CVBuilder = () => {
                     <div className="h-3 bg-primary/20 rounded w-3/4"></div>
                     <div className="h-2 bg-muted rounded w-1/2"></div>
                     <div className="h-2 bg-muted rounded w-2/3"></div>
-                    <div className="space-y-1 mt-4">
-                      <div className="h-1 bg-muted rounded w-full"></div>
-                      <div className="h-1 bg-muted rounded w-4/5"></div>
-                      <div className="h-1 bg-muted rounded w-3/5"></div>
-                    </div>
                   </div>
                 </div>
                 <Button size="sm" className="w-full mt-3" onClick={handlePreviewPDF}>
@@ -982,100 +712,31 @@ const CVBuilder = () => {
             </Card>
           </div>
         </div>
+
+        {/* Dialogs */}
+        <CoverLetterGenerator 
+          cv={{
+            personal_info: {
+              fullName: cvData.fullName,
+              email: cvData.email,
+              phone: cvData.phone,
+              address: cvData.address,
+              summary: cvData.summary
+            },
+            experience: cvData.experience,
+            education: cvData.education,
+            skills: cvData.skills
+          }}
+          isOpen={showCoverLetterDialog}
+          onClose={() => setShowCoverLetterDialog(false)}
+        />
+
+        <CVTextParser 
+          isOpen={showTextParserDialog}
+          onClose={() => setShowTextParserDialog(false)}
+          onDataParsed={handleParsedData}
+        />
       </div>
-
-        {/* AI Optimizer */}
-        <div className="mt-8">
-          <AIOptimizer 
-            cvData={cvData} 
-            onOptimizedData={handleOptimizedData} 
-          />
-        </div>
-
-        {/* CV Preview */}
-        <div className="mt-12">
-          <Card className="border-0 shadow-modern">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold flex items-center">
-                  <Eye className="h-5 w-5 mr-2 text-primary" />
-                  Aperçu du CV (Format A4)
-                </h3>
-                
-                {/* Barre d'outils flottante pour changement rapide */}
-                <div className="flex items-center space-x-3">
-                  <div className="bg-card/90 backdrop-blur-sm border border-border/50 rounded-xl p-3 shadow-elegant">
-                    <TemplateSelector 
-                      currentTemplate={templateStyle}
-                      onTemplateChange={(template) => setTemplateStyle(template as any)}
-                      compact={true}
-                    />
-                  </div>
-                </div>
-              </div>
-              <div id="cv-preview" className="overflow-hidden rounded-lg border">
-                <CVDisplay
-                  personalInfo={{
-                    fullName: cvData.fullName,
-                    email: cvData.email,
-                    phone: cvData.phone,
-                    address: cvData.address,
-                    summary: cvData.summary,
-                    photo_url: cvData.photo_url,
-                    birthDate: cvData.birthDate
-                  }}
-                  experience={cvData.experience}
-                  education={cvData.education}
-                  skills={cvData.skills}
-                  languages={cvData.languages}
-                  interests={cvData.interests}
-                  certifications={cvData.certifications}
-                  projects={cvData.projects}
-                  templateStyle={templateStyle}
-                  spacingSettings={spacingSettings}
-                  designSystem={{ font: currentFont, colors: colorPalette }}
-                />
-              </div>
-            </div>
-          </Card>
-        </div>
-
-        {/* Floating Save Status */}
-        {autoSaveEnabled && (
-          <div className="fixed bottom-4 right-4 z-50">
-            <div className="bg-card border rounded-lg px-3 py-2 shadow-lg">
-              <div className="flex items-center space-x-2 text-sm">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="text-muted-foreground">Sauvegarde automatique activée</span>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Dialogs */}
-      <CoverLetterGenerator 
-        cv={{
-          personal_info: {
-            fullName: cvData.fullName,
-            email: cvData.email,
-            phone: cvData.phone,
-            address: cvData.address,
-            summary: cvData.summary
-          },
-          experience: cvData.experience,
-          education: cvData.education,
-          skills: cvData.skills
-        }}
-        isOpen={showCoverLetterDialog}
-        onClose={() => setShowCoverLetterDialog(false)}
-      />
-
-      <CVTextParser 
-        isOpen={showTextParserDialog}
-        onClose={() => setShowTextParserDialog(false)}
-        onDataParsed={handleParsedData}
-      />
     </AppLayout>
   );
 };
