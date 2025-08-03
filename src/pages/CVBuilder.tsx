@@ -44,6 +44,7 @@ import SpacingControls from "@/components/SpacingControls";
 import TemplateSelector from "@/components/TemplateSelector";
 import DesignSystem from "@/components/DesignSystem";
 import DesignCustomizer from "@/components/DesignCustomizer";
+import CVSectionManager from "@/components/CVSectionManager";
 import { ProgressIndicator } from "@/components/ProgressIndicator";
 import { useAutoSave } from "@/hooks/useAutoSave";
 import { toastActions } from "@/components/EnhancedToast";
@@ -108,6 +109,7 @@ const CVBuilder = () => {
     certifications: CVData["certifications"],
     projects: CVData["projects"],
     photo_url: CVData["photo_url"],
+    cvSections: any[],
     birthDate: string
   }>({
     fullName: "",
@@ -123,7 +125,8 @@ const CVBuilder = () => {
     interests: [],
     certifications: [],
     projects: [],
-    photo_url: undefined
+    photo_url: undefined,
+    cvSections: []
   });
 
   const [newSkill, setNewSkill] = useState("");
@@ -151,7 +154,8 @@ const CVBuilder = () => {
           interests: cvData.interests,
           certifications: cvData.certifications,
           projects: cvData.projects,
-          photo_url: cvData.photo_url
+          photo_url: cvData.photo_url,
+          cv_sections: cvData.cvSections
         };
         await updateCV(id, cvDataToSave);
         toastActions.autoSave();
@@ -202,7 +206,8 @@ const CVBuilder = () => {
         interests: (cv.interests as string[]) || [],
         certifications: (cv.certifications as any[]) || [],
         projects: (cv.projects as any[]) || [],
-        photo_url: cv.photo_url || undefined
+        photo_url: cv.photo_url || undefined,
+        cvSections: (cv as any).cv_sections || []
       });
     } catch (error) {
       console.error("Error loading CV:", error);
@@ -234,10 +239,11 @@ const CVBuilder = () => {
       education: parsedData.education || [],
       skills: parsedData.skills || [],
       languages: [],
-      interests: [],
-      certifications: [],
-      projects: [],
-      photo_url: undefined
+        interests: [],
+        certifications: [],
+        projects: [],
+        photo_url: undefined,
+        cvSections: []
     });
     toastActions.importSuccess();
   };
@@ -346,7 +352,8 @@ const CVBuilder = () => {
         interests: cvData.interests,
         certifications: cvData.certifications,
         projects: cvData.projects,
-        photo_url: cvData.photo_url
+        photo_url: cvData.photo_url,
+        cv_sections: cvData.cvSections
       };
 
       if (id) {
@@ -529,9 +536,9 @@ const CVBuilder = () => {
                       <Award className="h-4 w-4 mr-2" />
                       Compétences
                     </TabsTrigger>
-                    <TabsTrigger value="additional" className="text-sm font-medium">
+                    <TabsTrigger value="sections" className="text-sm font-medium">
                       <Plus className="h-4 w-4 mr-2" />
-                      Sections+
+                      Sections
                     </TabsTrigger>
                     <TabsTrigger value="review" className="text-sm font-medium">
                       <Wand2 className="h-4 w-4 mr-2" />
@@ -866,6 +873,16 @@ const CVBuilder = () => {
                         </Card>
                       )}
                     </div>
+                  </TabsContent>
+
+                  <TabsContent value="sections" className="space-y-6">
+                    <CVSectionManager
+                      sections={cvData.cvSections || []}
+                      onSectionsChange={(sections) => setCvData(prev => ({
+                        ...prev,
+                        cvSections: sections
+                      }))}
+                    />
                   </TabsContent>
 
                   <TabsContent value="additional" className="space-y-6">
