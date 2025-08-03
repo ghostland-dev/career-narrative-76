@@ -62,13 +62,15 @@ const CVBuilder = () => {
     interests: CVData["interests"],
     certifications: CVData["certifications"],
     projects: CVData["projects"],
-    photo_url: CVData["photo_url"]
+    photo_url: CVData["photo_url"],
+    birthDate: string
   }>({
     fullName: "",
     email: "",
     phone: "",
     address: "",
     summary: "",
+    birthDate: "",
     experience: [],
     education: [],
     skills: [],
@@ -89,13 +91,14 @@ const CVBuilder = () => {
         const cvDataToSave = {
           title: cvTitle || "Mon CV",
           template_id: "modern",
-          personal_info: {
-            fullName: cvData.fullName,
-            email: cvData.email,
-            phone: cvData.phone,
-            address: cvData.address,
-            summary: cvData.summary
-          },
+        personal_info: {
+          fullName: cvData.fullName,
+          email: cvData.email,
+          phone: cvData.phone,
+          address: cvData.address,
+          summary: cvData.summary,
+          birthDate: cvData.birthDate
+        },
           experience: cvData.experience,
           education: cvData.education,
           skills: cvData.skills,
@@ -145,6 +148,7 @@ const CVBuilder = () => {
         phone: personalInfo?.phone || "",
         address: personalInfo?.address || "",
         summary: personalInfo?.summary || "",
+        birthDate: personalInfo?.birthDate || "",
         experience: experience || [],
         education: education || [],
         skills: skills || [],
@@ -179,6 +183,7 @@ const CVBuilder = () => {
       phone: parsedData.personal_info?.phone || "",
       address: parsedData.personal_info?.address || "",
       summary: parsedData.personal_info?.summary || "",
+      birthDate: parsedData.personal_info?.birthDate || "",
       experience: parsedData.experience || [],
       education: parsedData.education || [],
       skills: parsedData.skills || [],
@@ -285,7 +290,8 @@ const CVBuilder = () => {
           email: cvData.email,
           phone: cvData.phone,
           address: cvData.address,
-          summary: cvData.summary
+          summary: cvData.summary,
+          birthDate: cvData.birthDate
         },
         experience: cvData.experience,
         education: cvData.education,
@@ -515,7 +521,7 @@ const CVBuilder = () => {
                         />
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-6">
+                    <div className="grid grid-cols-3 gap-6">
                       <div className="space-y-2">
                         <Label htmlFor="phone">Téléphone</Label>
                         <Input
@@ -538,6 +544,18 @@ const CVBuilder = () => {
                             address: e.target.value
                           }))}
                           placeholder="Paris, France"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="birthDate">Date de naissance</Label>
+                        <Input
+                          id="birthDate"
+                          type="date"
+                          value={cvData.birthDate}
+                          onChange={(e) => setCvData(prev => ({
+                            ...prev,
+                            birthDate: e.target.value
+                          }))}
                         />
                       </div>
                     </div>
@@ -866,7 +884,8 @@ const CVBuilder = () => {
                     phone: cvData.phone,
                     address: cvData.address,
                     summary: cvData.summary,
-                    photo_url: cvData.photo_url
+                    photo_url: cvData.photo_url,
+                    birthDate: cvData.birthDate
                   }}
                   experience={cvData.experience}
                   education={cvData.education}

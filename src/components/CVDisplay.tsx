@@ -10,6 +10,7 @@ interface PersonalInfo {
   website?: string;
   linkedin?: string;
   photo_url?: string;
+  birthDate?: string;
 }
 
 interface Experience {
@@ -61,6 +62,18 @@ const CVDisplay: React.FC<CVDisplayProps> = ({
     return date.toLocaleDateString('fr-FR', { year: 'numeric', month: 'short' });
   };
 
+  const calculateAge = (birthDate: string) => {
+    if (!birthDate) return null;
+    const today = new Date();
+    const birth = new Date(birthDate);
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
   // Styles optimisés pour A4
   const baseStyles = "text-gray-800 leading-tight";
   const headerStyles = templateStyle === "modern" 
@@ -89,6 +102,11 @@ const CVDisplay: React.FC<CVDisplayProps> = ({
           <div className="flex-1">
             <h1 className="text-3xl font-bold text-gray-900 mb-1 tracking-tight">
               {personalInfo.fullName || "Nom non renseigné"}
+              {personalInfo.birthDate && (
+                <span className="text-lg font-normal text-gray-600 ml-2">
+                  ({calculateAge(personalInfo.birthDate)} ans)
+                </span>
+              )}
             </h1>
             {personalInfo.summary && (
               <p className="text-lg text-primary font-medium italic mb-3">
