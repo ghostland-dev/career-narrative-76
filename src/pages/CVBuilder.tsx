@@ -452,74 +452,92 @@ const CVBuilder = () => {
       actions={headerActions}
     >
       <div className="container mx-auto px-4 py-6">
-        <div className="grid lg:grid-cols-12 gap-8">
-          {/* Progress Indicator */}
-          <div className="lg:col-span-3">
-            <ProgressIndicator
-              sections={[
-                {
-                  id: 'personal',
-                  name: 'Informations personnelles',
-                  required: true,
-                  completed: !!(cvData?.fullName && cvData?.email)
-                },
-                {
-                  id: 'experience',
-                  name: 'Expérience professionnelle',
-                  required: true,
-                  completed: !!(cvData?.experience && cvData.experience.length > 0)
-                },
-                {
-                  id: 'education',
-                  name: 'Formation',
-                  required: true,
-                  completed: !!(cvData?.education && cvData.education.length > 0)
-                },
-                {
-                  id: 'skills',
-                  name: 'Compétences',
-                  required: false,
-                  completed: !!(cvData?.skills && cvData.skills.length > 0)
-                },
-                {
-                  id: 'additional',
-                  name: 'Informations supplémentaires',
-                  required: false,
-                  completed: !!(cvData?.languages?.length || cvData?.interests?.length || cvData?.certifications?.length || cvData?.projects?.length)
-                },
-                {
-                  id: 'review',
-                  name: 'Révision et optimisation',
-                  required: false,
-                  completed: false
-                }
-              ]}
-              currentSection={currentTab}
-              onSectionClick={setCurrentTab}
-            />
+        <div className="grid lg:grid-cols-4 gap-6 h-[calc(100vh-8rem)]">
+          {/* Sidebar Navigation */}
+          <div className="lg:col-span-1 space-y-4">
+            {/* Quick Navigation */}
+            <Card className="border-0 shadow-card sticky top-6">
+              <CardContent className="p-4">
+                <h3 className="font-semibold mb-3">Navigation rapide</h3>
+                <div className="space-y-2">
+                  {[
+                    { id: 'personal', icon: User, label: 'Personnel', completed: !!(cvData?.fullName && cvData?.email) },
+                    { id: 'experience', icon: Briefcase, label: 'Expérience', completed: !!(cvData?.experience && cvData.experience.length > 0) },
+                    { id: 'education', icon: GraduationCap, label: 'Formation', completed: !!(cvData?.education && cvData.education.length > 0) },
+                    { id: 'skills', icon: Award, label: 'Compétences', completed: !!(cvData?.skills && cvData.skills.length > 0) },
+                    { id: 'sections', icon: Plus, label: 'Sections', completed: !!(cvData?.cvSections && cvData.cvSections.length > 0) },
+                    { id: 'review', icon: Wand2, label: 'Design', completed: false }
+                  ].map((section) => (
+                    <Button
+                      key={section.id}
+                      variant={currentTab === section.id ? "default" : "ghost"}
+                      size="sm"
+                      onClick={() => setCurrentTab(section.id)}
+                      className={`w-full justify-start text-left ${
+                        currentTab === section.id ? "bg-primary text-white" : ""
+                      }`}
+                    >
+                      <section.icon className="h-4 w-4 mr-2" />
+                      <span className="flex-1">{section.label}</span>
+                      {section.completed && (
+                        <div className="w-2 h-2 bg-success rounded-full ml-2" />
+                      )}
+                    </Button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Quick Design Controls */}
+            <Card className="border-0 shadow-card">
+              <CardContent className="p-4">
+                <TemplateSelector 
+                  currentTemplate={templateStyle}
+                  onTemplateChange={(template) => setTemplateStyle(template as any)}
+                  compact={true}
+                />
+              </CardContent>
+            </Card>
           </div>
           
           {/* Main Editor Panel */}
-          <div className="lg:col-span-9 space-y-6">
+          <div className="lg:col-span-2 overflow-y-auto">
             {/* CV Title */}
-            <Card className="border-0 shadow-modern">
-              <div className="p-6">
-                <Label htmlFor="cv-title" className="text-base font-semibold">Titre du CV</Label>
+            <Card className="border-0 shadow-card mb-6">
+              <CardContent className="p-4">
                 <Input
-                  id="cv-title"
                   value={cvTitle}
                   onChange={(e) => setCvTitle(e.target.value)}
-                  placeholder="Ex: CV Développeur Frontend"
-                  className="mt-2 text-lg font-medium"
+                  placeholder="Titre de votre CV"
+                  className="text-lg font-medium border-0 focus-visible:ring-1"
                 />
-              </div>
+              </CardContent>
             </Card>
 
-            {/* Main Content Tabs */}
-            <Card className="border-0 shadow-modern">
-              <div className="p-6">
-                <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
-                  <TabsList className="grid w-full grid-cols-6 mb-6">
+            {/* Compact Tabs */}
+            <div className="bg-card rounded-lg p-2 mb-6 border">
+              <div className="flex flex-wrap gap-1">
+                {[
+                  { id: 'personal', icon: User, label: 'Personnel' },
+                  { id: 'experience', icon: Briefcase, label: 'Expérience' },
+                  { id: 'education', icon: GraduationCap, label: 'Formation' },
+                  { id: 'skills', icon: Award, label: 'Compétences' },
+                  { id: 'sections', icon: Plus, label: 'Sections' },
+                  { id: 'review', icon: Wand2, label: 'Design' }
+                ].map((tab) => (
+                  <Button
+                    key={tab.id}
+                    variant={currentTab === tab.id ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => setCurrentTab(tab.id)}
+                    className="text-xs"
+                  >
+                    <tab.icon className="h-3 w-3 mr-1" />
+                    {tab.label}
+                  </Button>
+                ))}
+              </div>
+            </div>
                     <TabsTrigger value="personal" className="text-sm font-medium">
                       <User className="h-4 w-4 mr-2" />
                       Personnel
@@ -934,17 +952,37 @@ const CVBuilder = () => {
               </div>
             </Card>
 
-            <PhotoUpload
-              currentPhotoUrl={cvData.photo_url}
-              onPhotoUpload={(photoUrl) => {
-                setCvData(prev => ({ ...prev, photo_url: photoUrl }));
-              }}
-              onPhotoRemove={() => {
-                setCvData(prev => ({ ...prev, photo_url: undefined }));
-              }}
-            />
+          </div>
+
+          {/* Preview Panel */}
+          <div className="lg:col-span-1 sticky top-6 h-fit">
+            <Card className="border-0 shadow-card">
+              <CardContent className="p-4">
+                <h3 className="font-semibold mb-3 flex items-center">
+                  <Eye className="h-4 w-4 mr-2 text-primary" />
+                  Aperçu
+                </h3>
+                <div className="bg-muted/30 rounded-lg p-4 aspect-[3/4]">
+                  <div className="space-y-2">
+                    <div className="h-3 bg-primary/20 rounded w-3/4"></div>
+                    <div className="h-2 bg-muted rounded w-1/2"></div>
+                    <div className="h-2 bg-muted rounded w-2/3"></div>
+                    <div className="space-y-1 mt-4">
+                      <div className="h-1 bg-muted rounded w-full"></div>
+                      <div className="h-1 bg-muted rounded w-4/5"></div>
+                      <div className="h-1 bg-muted rounded w-3/5"></div>
+                    </div>
+                  </div>
+                </div>
+                <Button size="sm" className="w-full mt-3" onClick={handlePreviewPDF}>
+                  <Eye className="h-3 w-3 mr-2" />
+                  Aperçu complet
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         </div>
+      </div>
 
         {/* AI Optimizer */}
         <div className="mt-8">
