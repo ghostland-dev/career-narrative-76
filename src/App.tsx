@@ -8,6 +8,7 @@ import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import CVBuilder from "./pages/CVBuilder";
+import Templates from "./pages/Templates";
 
 const queryClient = new QueryClient();
 
@@ -21,6 +22,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<div><Auth /></div>} />
           <Route path="/dashboard" element={<div><Dashboard /></div>} />
+          <Route path="/templates" element={<div><Templates /></div>} />
           <Route path="/cv-builder" element={<div><CVBuilder /></div>} />
           <Route path="/cv-builder/:id" element={<div><CVBuilder /></div>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

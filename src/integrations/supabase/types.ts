@@ -79,6 +79,81 @@ export type Database = {
           },
         ]
       }
+      cv_templates: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_premium: boolean | null
+          name: string
+          preview_image_url: string | null
+          styles: Json
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id: string
+          is_premium?: boolean | null
+          name: string
+          preview_image_url?: string | null
+          styles?: Json
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_premium?: boolean | null
+          name?: string
+          preview_image_url?: string | null
+          styles?: Json
+        }
+        Relationships: []
+      }
+      cvs: {
+        Row: {
+          created_at: string
+          education: Json
+          experience: Json
+          id: string
+          is_published: boolean | null
+          last_exported_at: string | null
+          personal_info: Json
+          skills: Json
+          template_id: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          education?: Json
+          experience?: Json
+          id?: string
+          is_published?: boolean | null
+          last_exported_at?: string | null
+          personal_info?: Json
+          skills?: Json
+          template_id?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          education?: Json
+          experience?: Json
+          id?: string
+          is_published?: boolean | null
+          last_exported_at?: string | null
+          personal_info?: Json
+          skills?: Json
+          template_id?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       email_automations: {
         Row: {
           created_at: string

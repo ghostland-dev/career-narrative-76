@@ -18,54 +18,28 @@ import {
   GraduationCap, 
   Award,
   Plus,
-  Trash2
+  Trash2,
+  Loader2
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-
-interface CVData {
-  personalInfo: {
-    fullName: string;
-    email: string;
-    phone: string;
-    address: string;
-    summary: string;
-  };
-  experience: Array<{
-    id: string;
-    title: string;
-    company: string;
-    location: string;
-    startDate: string;
-    endDate: string;
-    description: string;
-  }>;
-  education: Array<{
-    id: string;
-    degree: string;
-    institution: string;
-    location: string;
-    startDate: string;
-    endDate: string;
-    description: string;
-  }>;
-  skills: string[];
-}
+import { getCV, updateCV, createCV, type CVData } from "@/lib/cv-service";
+import { exportToPDF, previewPDF } from "@/lib/pdf-export";
 
 const CVBuilder = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [cvTitle, setCvTitle] = useState("");
 
-  const [cvData, setCvData] = useState<CVData>({
-    personalInfo: {
-      fullName: "",
-      email: "",
-      phone: "",
-      address: "",
-      summary: ""
-    },
+  const [cvData, setCvData] = useState<CVData["personal_info"] & { experience: CVData["experience"], education: CVData["education"], skills: CVData["skills"] }>({
+    fullName: "",
+    email: "",
+    phone: "",
+    address: "",
+    summary: "",
     experience: [],
     education: [],
     skills: []
@@ -74,14 +48,53 @@ const CVBuilder = () => {
   const [newSkill, setNewSkill] = useState("");
 
   useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        navigate("/auth");
-      }
-    };
     checkAuth();
-  }, [navigate]);
+    if (id) {
+      loadCV();
+    }
+  }, [id]);
+
+  const checkAuth = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      navigate("/auth");
+    }
+  };
+
+  const loadCV = async () => {
+    if (!id) return;
+    
+    setIsLoading(true);
+    try {
+      const cv = await getCV(id);
+      setCvTitle(cv.title);
+      const personalInfo = cv.personal_info as any;
+      const experience = cv.experience as any[];
+      const education = cv.education as any[];
+      const skills = cv.skills as string[];
+      
+      setCvData({
+        fullName: personalInfo?.fullName || "",
+        email: personalInfo?.email || "",
+        phone: personalInfo?.phone || "",
+        address: personalInfo?.address || "",
+        summary: personalInfo?.summary || "",
+        experience: experience || [],
+        education: education || [],
+        skills: skills || []
+      });
+    } catch (error) {
+      console.error("Error loading CV:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger le CV.",
+        variant: "destructive",
+      });
+      navigate("/dashboard");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const addExperience = () => {
     const newExp = {
@@ -165,24 +178,89 @@ const CVBuilder = () => {
   };
 
   const handleSave = async () => {
-    setIsLoading(true);
+    setIsSaving(true);
     try {
-      // TODO: Implement save to Supabase
-      toast({
-        title: "CV sauvegardé",
-        description: "Vos modifications ont été enregistrées avec succès.",
-      });
+      const cvDataToSave = {
+        title: cvTitle || "Mon CV",
+        template_id: "modern",
+        personal_info: {
+          fullName: cvData.fullName,
+          email: cvData.email,
+          phone: cvData.phone,
+          address: cvData.address,
+          summary: cvData.summary
+        },
+        experience: cvData.experience,
+        education: cvData.education,
+        skills: cvData.skills
+      };
+
+      if (id) {
+        await updateCV(id, cvDataToSave);
+        toast({
+          title: "CV sauvegardé",
+          description: "Vos modifications ont été enregistrées avec succès.",
+        });
+      } else {
+        const newCV = await createCV(cvDataToSave);
+        toast({
+          title: "CV créé",
+          description: "Votre CV a été créé avec succès.",
+        });
+        navigate(`/cv-builder/${newCV.id}`);
+      }
     } catch (error) {
+      console.error("Error saving CV:", error);
       toast({
         title: "Erreur",
         description: "Impossible de sauvegarder le CV.",
         variant: "destructive",
       });
     } finally {
-      setIsLoading(false);
+      setIsSaving(false);
     }
   };
 
+  const handleExportPDF = async () => {
+    try {
+      await exportToPDF('cv-preview', `${cvTitle || 'CV'}.pdf`);
+      toast({
+        title: "Export réussi",
+        description: "Votre CV a été exporté en PDF.",
+      });
+    } catch (error) {
+      console.error("Error exporting PDF:", error);
+      toast({
+        title: "Erreur d'export",
+        description: "Impossible d'exporter le CV en PDF.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handlePreviewPDF = async () => {
+    try {
+      await previewPDF('cv-preview');
+    } catch (error) {
+      console.error("Error previewing PDF:", error);
+      toast({
+        title: "Erreur d'aperçu",
+        description: "Impossible d'afficher l'aperçu PDF.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 text-primary mx-auto mb-4 animate-spin" />
+          <p className="text-muted-foreground">Chargement du CV...</p>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -201,17 +279,26 @@ const CVBuilder = () => {
             </div>
           </div>
           <div className="flex items-center space-x-3">
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" onClick={handlePreviewPDF}>
               <Eye className="h-4 w-4 mr-2" />
-              Aperçu
+              Aperçu PDF
             </Button>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" onClick={handleExportPDF}>
               <Download className="h-4 w-4 mr-2" />
-              Exporter
+              Télécharger PDF
             </Button>
-            <Button size="sm" onClick={handleSave} disabled={isLoading}>
-              <Save className="h-4 w-4 mr-2" />
-              Sauvegarder
+            <Button size="sm" onClick={handleSave} disabled={isSaving}>
+              {isSaving ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Sauvegarde...
+                </>
+              ) : (
+                <>
+                  <Save className="h-4 w-4 mr-2" />
+                  Sauvegarder
+                </>
+              )}
             </Button>
           </div>
         </div>
@@ -248,10 +335,10 @@ const CVBuilder = () => {
                       <Label htmlFor="fullName">Nom complet</Label>
                       <Input
                         id="fullName"
-                        value={cvData.personalInfo.fullName}
+                        value={cvData.fullName}
                         onChange={(e) => setCvData(prev => ({
                           ...prev,
-                          personalInfo: { ...prev.personalInfo, fullName: e.target.value }
+                          fullName: e.target.value
                         }))}
                         placeholder="Jean Dupont"
                       />
@@ -261,10 +348,10 @@ const CVBuilder = () => {
                       <Input
                         id="email"
                         type="email"
-                        value={cvData.personalInfo.email}
+                        value={cvData.email}
                         onChange={(e) => setCvData(prev => ({
                           ...prev,
-                          personalInfo: { ...prev.personalInfo, email: e.target.value }
+                          email: e.target.value
                         }))}
                         placeholder="jean.dupont@email.com"
                       />
@@ -275,10 +362,10 @@ const CVBuilder = () => {
                       <Label htmlFor="phone">Téléphone</Label>
                       <Input
                         id="phone"
-                        value={cvData.personalInfo.phone}
+                        value={cvData.phone}
                         onChange={(e) => setCvData(prev => ({
                           ...prev,
-                          personalInfo: { ...prev.personalInfo, phone: e.target.value }
+                          phone: e.target.value
                         }))}
                         placeholder="+33 1 23 45 67 89"
                       />
@@ -287,10 +374,10 @@ const CVBuilder = () => {
                       <Label htmlFor="address">Adresse</Label>
                       <Input
                         id="address"
-                        value={cvData.personalInfo.address}
+                        value={cvData.address}
                         onChange={(e) => setCvData(prev => ({
                           ...prev,
-                          personalInfo: { ...prev.personalInfo, address: e.target.value }
+                          address: e.target.value
                         }))}
                         placeholder="Paris, France"
                       />
@@ -300,10 +387,10 @@ const CVBuilder = () => {
                     <Label htmlFor="summary">Résumé professionnel</Label>
                     <Textarea
                       id="summary"
-                      value={cvData.personalInfo.summary}
+                      value={cvData.summary}
                       onChange={(e) => setCvData(prev => ({
                         ...prev,
-                        personalInfo: { ...prev.personalInfo, summary: e.target.value }
+                        summary: e.target.value
                       }))}
                       placeholder="Décrivez brièvement votre profil professionnel..."
                       rows={4}
@@ -554,35 +641,35 @@ const CVBuilder = () => {
               <Separator className="mb-6" />
               
               {/* CV Preview */}
-              <div className="bg-background border border-border rounded-lg p-6 space-y-6 min-h-[600px]">
+              <div id="cv-preview" className="bg-background border border-border rounded-lg p-6 space-y-6 min-h-[600px]">
                 {/* Personal Info */}
                 <div className="text-center">
                   <h1 className="text-2xl font-bold text-foreground">
-                    {cvData.personalInfo.fullName || "Votre Nom"}
+                    {cvData.fullName || "Votre Nom"}
                   </h1>
                   <div className="text-sm text-muted-foreground mt-2 space-x-2">
-                    {cvData.personalInfo.email && <span>{cvData.personalInfo.email}</span>}
-                    {cvData.personalInfo.phone && (
+                    {cvData.email && <span>{cvData.email}</span>}
+                    {cvData.phone && (
                       <>
                         <span>•</span>
-                        <span>{cvData.personalInfo.phone}</span>
+                        <span>{cvData.phone}</span>
                       </>
                     )}
-                    {cvData.personalInfo.address && (
+                    {cvData.address && (
                       <>
                         <span>•</span>
-                        <span>{cvData.personalInfo.address}</span>
+                        <span>{cvData.address}</span>
                       </>
                     )}
                   </div>
                 </div>
 
                 {/* Summary */}
-                {cvData.personalInfo.summary && (
+                {cvData.summary && (
                   <div>
                     <h2 className="text-lg font-semibold text-foreground mb-2">Résumé</h2>
                     <p className="text-sm text-muted-foreground leading-relaxed">
-                      {cvData.personalInfo.summary}
+                      {cvData.summary}
                     </p>
                   </div>
                 )}

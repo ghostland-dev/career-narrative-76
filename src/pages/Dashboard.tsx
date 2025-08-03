@@ -3,49 +3,50 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Plus, FileText, Eye, Edit3, Download, LogOut, User as UserIcon } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Plus, FileText, Eye, Edit3, Download, LogOut, UserIcon, Trash2, Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { getUserCVs, deleteCV, createCV, getTemplates, type CVTemplate } from "@/lib/cv-service";
 import type { User } from "@supabase/supabase-js";
 
 const Dashboard = () => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [cvs, setCvs] = useState<any[]>([]);
+  const [templates, setTemplates] = useState<CVTemplate[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [newCVTitle, setNewCVTitle] = useState("");
+  const [selectedTemplate, setSelectedTemplate] = useState("modern");
+  const [isCreating, setIsCreating] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Mock CV data - later will be fetched from Supabase
-  const [cvs] = useState([
-    {
-      id: "1",
-      name: "CV Développeur Frontend",
-      lastModified: "2024-01-15",
-      status: "publié",
-      template: "Moderne"
-    },
-    {
-      id: "2", 
-      name: "CV Marketing Digital",
-      lastModified: "2024-01-10",
-      status: "brouillon",
-      template: "Créatif"
-    }
-  ]);
+  useEffect(() => {
+    checkAuth();
+    loadTemplates();
+  }, []);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        navigate("/auth");
-        return;
-      }
-      
-      setUser(session.user);
-      setIsLoading(false);
-    };
+    if (user) {
+      loadCVs();
+    }
+  }, [user]);
 
-    checkAuth();
+  const checkAuth = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session) {
+      navigate("/auth");
+      return;
+    }
+    
+    setUser(session.user);
+    setIsLoading(false);
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -59,7 +60,30 @@ const Dashboard = () => {
     );
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  };
+
+  const loadCVs = async () => {
+    try {
+      const data = await getUserCVs();
+      setCvs(data);
+    } catch (error) {
+      console.error("Error loading CVs:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger vos CV.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const loadTemplates = async () => {
+    try {
+      const data = await getTemplates();
+      setTemplates(data);
+    } catch (error) {
+      console.error("Error loading templates:", error);
+    }
+  };
 
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut();
@@ -72,19 +96,89 @@ const Dashboard = () => {
     }
   };
 
-  const handleCreateCV = () => {
-    navigate("/cv-builder");
+  const handleCreateCV = async () => {
+    if (!newCVTitle.trim()) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez saisir un titre pour votre CV.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsCreating(true);
+    try {
+      const newCV = await createCV({
+        title: newCVTitle,
+        template_id: selectedTemplate,
+        personal_info: {
+          fullName: "",
+          email: "",
+          phone: "",
+          address: "",
+          summary: ""
+        },
+        experience: [],
+        education: [],
+        skills: []
+      });
+
+      toast({
+        title: "CV créé",
+        description: "Votre nouveau CV a été créé avec succès.",
+      });
+
+      setShowCreateDialog(false);
+      setNewCVTitle("");
+      setSelectedTemplate("modern");
+      navigate(`/cv-builder/${newCV.id}`);
+    } catch (error) {
+      console.error("Error creating CV:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de créer le CV.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsCreating(false);
+    }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "publié":
-        return "bg-success text-success-foreground";
-      case "brouillon":
-        return "bg-muted text-muted-foreground";
-      default:
-        return "bg-secondary text-secondary-foreground";
+  const handleDeleteCV = async (id: string, title: string) => {
+    if (!confirm(`Êtes-vous sûr de vouloir supprimer le CV "${title}" ?`)) {
+      return;
     }
+
+    try {
+      await deleteCV(id);
+      toast({
+        title: "CV supprimé",
+        description: "Le CV a été supprimé avec succès.",
+      });
+      loadCVs();
+    } catch (error) {
+      console.error("Error deleting CV:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de supprimer le CV.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const filteredCVs = cvs.filter(cv =>
+    cv.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const getStatusColor = (isPublished: boolean) => {
+    return isPublished
+      ? "bg-success text-success-foreground"
+      : "bg-muted text-muted-foreground";
+  };
+
+  const getTemplateDisplay = (templateId: string) => {
+    const template = templates.find(t => t.id === templateId);
+    return template?.name || templateId;
   };
 
   if (isLoading) {
@@ -131,19 +225,65 @@ const Dashboard = () => {
 
         {/* Quick Actions */}
         <div className="grid md:grid-cols-3 gap-6 mb-8">
-          <Card className="border-0 shadow-card hover:shadow-elegant transition-smooth cursor-pointer" onClick={handleCreateCV}>
-            <CardHeader className="text-center">
-              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Plus className="w-6 h-6 text-primary" />
+          <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+            <DialogTrigger asChild>
+              <Card className="border-0 shadow-card hover:shadow-elegant transition-smooth cursor-pointer">
+                <CardHeader className="text-center">
+                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <Plus className="w-6 h-6 text-primary" />
+                  </div>
+                  <CardTitle className="text-lg">Nouveau CV</CardTitle>
+                  <CardDescription>
+                    Créez un CV professionnel à partir de zéro
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Créer un nouveau CV</DialogTitle>
+                <DialogDescription>
+                  Choisissez un titre et un template pour votre nouveau CV
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="cv-title">Titre du CV</Label>
+                  <Input
+                    id="cv-title"
+                    value={newCVTitle}
+                    onChange={(e) => setNewCVTitle(e.target.value)}
+                    placeholder="Ex: CV Développeur Frontend"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="template">Template</Label>
+                  <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choisir un template" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {templates.map((template) => (
+                        <SelectItem key={template.id} value={template.id}>
+                          {template.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
-              <CardTitle className="text-lg">Nouveau CV</CardTitle>
-              <CardDescription>
-                Créez un CV professionnel à partir de zéro
-              </CardDescription>
-            </CardHeader>
-          </Card>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setShowCreateDialog(false)}>
+                  Annuler
+                </Button>
+                <Button onClick={handleCreateCV} disabled={isCreating}>
+                  {isCreating ? "Création..." : "Créer le CV"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
 
-          <Card className="border-0 shadow-card">
+          <Card className="border-0 shadow-card" onClick={() => navigate("/templates")}>
             <CardHeader className="text-center">
               <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mx-auto mb-4">
                 <FileText className="w-6 h-6 text-accent" />
@@ -171,44 +311,70 @@ const Dashboard = () => {
         {/* CV List */}
         <div className="space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-semibold">Mes CV</h2>
-            <Button onClick={handleCreateCV}>
-              <Plus className="w-4 h-4 mr-2" />
-              Créer un CV
-            </Button>
+            <h2 className="text-2xl font-semibold">Mes CV ({cvs.length})</h2>
+            <div className="flex items-center space-x-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Rechercher un CV..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 w-64"
+                />
+              </div>
+              <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+                <DialogTrigger asChild>
+                  <Button>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Créer un CV
+                  </Button>
+                </DialogTrigger>
+              </Dialog>
+            </div>
           </div>
 
-          {cvs.length === 0 ? (
+          {filteredCVs.length === 0 ? (
             <Card className="border-0 shadow-card">
               <CardContent className="text-center py-12">
                 <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">Aucun CV créé</h3>
+                <h3 className="text-lg font-semibold mb-2">
+                  {searchQuery ? "Aucun CV trouvé" : "Aucun CV créé"}
+                </h3>
                 <p className="text-muted-foreground mb-4">
-                  Commencez par créer votre premier CV professionnel
+                  {searchQuery 
+                    ? "Aucun CV ne correspond à votre recherche"
+                    : "Commencez par créer votre premier CV professionnel"
+                  }
                 </p>
-                <Button onClick={handleCreateCV}>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Créer mon premier CV
-                </Button>
+                {!searchQuery && (
+                  <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+                    <DialogTrigger asChild>
+                      <Button>
+                        <Plus className="w-4 h-4 mr-2" />
+                        Créer mon premier CV
+                      </Button>
+                    </DialogTrigger>
+                  </Dialog>
+                )}
               </CardContent>
             </Card>
           ) : (
             <div className="grid gap-4">
-              {cvs.map((cv) => (
+              {filteredCVs.map((cv) => (
                 <Card key={cv.id} className="border-0 shadow-card hover:shadow-elegant transition-smooth">
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
                         <div className="flex items-center space-x-3 mb-2">
-                          <h3 className="text-lg font-semibold">{cv.name}</h3>
-                          <Badge className={getStatusColor(cv.status)}>
-                            {cv.status}
+                          <h3 className="text-lg font-semibold">{cv.title}</h3>
+                          <Badge className={getStatusColor(cv.is_published)}>
+                            {cv.is_published ? "Publié" : "Brouillon"}
                           </Badge>
                         </div>
                         <div className="text-sm text-muted-foreground space-x-4">
-                          <span>Modifié le {cv.lastModified}</span>
+                          <span>Modifié le {new Date(cv.updated_at).toLocaleDateString('fr-FR')}</span>
                           <span>•</span>
-                          <span>Template: {cv.template}</span>
+                          <span>Template: {getTemplateDisplay(cv.template_id)}</span>
                         </div>
                       </div>
                       <div className="flex items-center space-x-2">
@@ -223,6 +389,13 @@ const Dashboard = () => {
                         <Button variant="outline" size="sm">
                           <Download className="w-4 h-4 mr-2" />
                           Exporter
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDeleteCV(cv.id, cv.title)}
+                        >
+                          <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
                     </div>
