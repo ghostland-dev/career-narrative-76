@@ -69,6 +69,14 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				}
 			},
+			fontFamily: {
+				'sans': ['Inter', 'system-ui', 'sans-serif'],
+				'serif': ['Playfair Display', 'Georgia', 'serif'],
+				'mono': ['JetBrains Mono', 'Menlo', 'monospace'],
+				'garamond': ['EB Garamond', 'Times', 'serif'],
+				'inter': ['Inter', 'sans-serif'],
+				'playfair': ['Playfair Display', 'serif'],
+			},
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
@@ -76,12 +84,14 @@ export default {
 			},
 			backgroundImage: {
 				'hero-gradient': 'var(--hero-gradient)',
-				'glass-gradient': 'linear-gradient(145deg, hsl(var(--glass)), hsl(var(--background)))'
+				'glass-gradient': 'linear-gradient(145deg, hsl(var(--glass)), hsl(var(--background)))',
+				'modern-gradient': 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)), hsl(var(--accent)))'
 			},
 			boxShadow: {
 				'elegant': 'var(--shadow-elegant)',
 				'glow': 'var(--shadow-glow)',
-				'card': 'var(--shadow-card)'
+				'card': 'var(--shadow-card)',
+				'modern': '0 20px 40px -12px hsl(var(--primary) / 0.25)'
 			},
 			transitionTimingFunction: {
 				'smooth': 'var(--transition-smooth)',
