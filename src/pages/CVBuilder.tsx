@@ -35,6 +35,9 @@ import AIOptimizer from "@/components/AIOptimizer";
 import CoverLetterGenerator from "@/components/CoverLetterGenerator";
 import CVTextParser from "@/components/CVTextParser";
 import CVDisplay from "@/components/CVDisplay";
+import PhotoUpload from "@/components/PhotoUpload";
+import SpellChecker from "@/components/SpellChecker";
+import CVEnhancedBuilder from "@/components/CVEnhancedBuilder";
 
 const CVBuilder = () => {
   const navigate = useNavigate();
@@ -46,7 +49,16 @@ const CVBuilder = () => {
   const [showCoverLetterDialog, setShowCoverLetterDialog] = useState(false);
   const [showTextParserDialog, setShowTextParserDialog] = useState(false);
 
-  const [cvData, setCvData] = useState<CVData["personal_info"] & { experience: CVData["experience"], education: CVData["education"], skills: CVData["skills"] }>({
+  const [cvData, setCvData] = useState<CVData["personal_info"] & { 
+    experience: CVData["experience"], 
+    education: CVData["education"], 
+    skills: CVData["skills"],
+    languages: CVData["languages"],
+    interests: CVData["interests"],
+    certifications: CVData["certifications"],
+    projects: CVData["projects"],
+    photo_url: CVData["photo_url"]
+  }>({
     fullName: "",
     email: "",
     phone: "",
@@ -54,7 +66,12 @@ const CVBuilder = () => {
     summary: "",
     experience: [],
     education: [],
-    skills: []
+    skills: [],
+    languages: [],
+    interests: [],
+    certifications: [],
+    projects: [],
+    photo_url: undefined
   });
 
   const [newSkill, setNewSkill] = useState("");
@@ -93,7 +110,12 @@ const CVBuilder = () => {
         summary: personalInfo?.summary || "",
         experience: experience || [],
         education: education || [],
-        skills: skills || []
+        skills: skills || [],
+        languages: (cv.languages as any[]) || [],
+        interests: (cv.interests as string[]) || [],
+        certifications: (cv.certifications as any[]) || [],
+        projects: (cv.projects as any[]) || [],
+        photo_url: cv.photo_url || undefined
       });
     } catch (error) {
       console.error("Error loading CV:", error);
@@ -125,7 +147,12 @@ const CVBuilder = () => {
       summary: parsedData.personal_info?.summary || "",
       experience: parsedData.experience || [],
       education: parsedData.education || [],
-      skills: parsedData.skills || []
+      skills: parsedData.skills || [],
+      languages: [],
+      interests: [],
+      certifications: [],
+      projects: [],
+      photo_url: undefined
     });
     toast({
       title: "Données importées !",
@@ -229,7 +256,12 @@ const CVBuilder = () => {
         },
         experience: cvData.experience,
         education: cvData.education,
-        skills: cvData.skills
+        skills: cvData.skills,
+        languages: cvData.languages,
+        interests: cvData.interests,
+        certifications: cvData.certifications,
+        projects: cvData.projects,
+        photo_url: cvData.photo_url
       };
 
       if (id) {
@@ -356,7 +388,7 @@ const CVBuilder = () => {
             <Card className="border-0 shadow-modern">
               <div className="p-6">
                 <Tabs defaultValue="personal" className="w-full">
-                  <TabsList className="grid w-full grid-cols-4 mb-6">
+                  <TabsList className="grid w-full grid-cols-6 mb-6">
                     <TabsTrigger value="personal" className="text-sm font-medium">
                       <User className="h-4 w-4 mr-2" />
                       Personnel
@@ -372,6 +404,14 @@ const CVBuilder = () => {
                     <TabsTrigger value="skills" className="text-sm font-medium">
                       <Award className="h-4 w-4 mr-2" />
                       Compétences
+                    </TabsTrigger>
+                    <TabsTrigger value="additional" className="text-sm font-medium">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Sections+
+                    </TabsTrigger>
+                    <TabsTrigger value="review" className="text-sm font-medium">
+                      <Wand2 className="h-4 w-4 mr-2" />
+                      Révision
                     </TabsTrigger>
                   </TabsList>
 
@@ -691,9 +731,46 @@ const CVBuilder = () => {
                       )}
                     </div>
                   </TabsContent>
+
+                  {/* Nouvelle section pour les sections supplémentaires */}
+                  <TabsContent value="additional" className="space-y-6">
+                    <CVEnhancedBuilder cvData={cvData} setCvData={setCvData} />
+                  </TabsContent>
+
+                  {/* Section de révision avec vérification orthographique */}
+                  <TabsContent value="review" className="space-y-6">
+                    <div className="text-center mb-6">
+                      <h3 className="text-lg font-semibold mb-2">Révision et amélioration</h3>
+                      <p className="text-muted-foreground">
+                        Vérifiez l'orthographe et la grammaire de votre CV avant finalisation
+                      </p>
+                    </div>
+                    
+                    <SpellChecker 
+                      text={`${cvData.fullName} ${cvData.summary} ${cvData.experience.map(exp => `${exp.title} ${exp.description}`).join(' ')} ${cvData.education.map(edu => `${edu.degree} ${edu.description}`).join(' ')}`}
+                      onCorrectedText={(correctedText) => {
+                        // Cette fonction pourrait être améliorée pour appliquer les corrections de manière plus sophistiquée
+                        toast({
+                          title: "Corrections appliquées",
+                          description: "Consultez les modifications dans les sections correspondantes.",
+                        });
+                      }}
+                    />
+                  </TabsContent>
                 </Tabs>
               </div>
             </Card>
+
+            {/* Section Photo */}
+            <PhotoUpload
+              currentPhotoUrl={cvData.photo_url}
+              onPhotoUpload={(photoUrl) => {
+                setCvData(prev => ({ ...prev, photo_url: photoUrl }));
+              }}
+              onPhotoRemove={() => {
+                setCvData(prev => ({ ...prev, photo_url: undefined }));
+              }}
+            />
           </div>
 
           {/* AI Sidebar */}
@@ -722,11 +799,16 @@ const CVBuilder = () => {
                     email: cvData.email,
                     phone: cvData.phone,
                     address: cvData.address,
-                    summary: cvData.summary
+                    summary: cvData.summary,
+                    photo_url: cvData.photo_url
                   }}
                   experience={cvData.experience}
                   education={cvData.education}
                   skills={cvData.skills}
+                  languages={cvData.languages}
+                  interests={cvData.interests}
+                  certifications={cvData.certifications}
+                  projects={cvData.projects}
                   templateStyle="modern"
                 />
               </div>

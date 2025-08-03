@@ -31,6 +31,28 @@ export interface CVData {
     description: string;
   }>;
   skills: string[];
+  languages?: Array<{
+    id: string;
+    name: string;
+    level: string;
+  }>;
+  interests?: string[];
+  certifications?: Array<{
+    id: string;
+    name: string;
+    issuer: string;
+    date: string;
+    url?: string;
+  }>;
+  projects?: Array<{
+    id: string;
+    name: string;
+    description: string;
+    technologies: string;
+    url?: string;
+    date: string;
+  }>;
+  photo_url?: string;
 }
 
 export interface CVTemplate {
@@ -57,6 +79,11 @@ export const createCV = async (cvData: Omit<CVData, "id">) => {
       experience: cvData.experience,
       education: cvData.education,
       skills: cvData.skills,
+      languages: cvData.languages || [],
+      interests: cvData.interests || [],
+      certifications: cvData.certifications || [],
+      projects: cvData.projects || [],
+      photo_url: cvData.photo_url || null,
     })
     .select()
     .single();
@@ -79,6 +106,11 @@ export const updateCV = async (id: string, cvData: Partial<CVData>) => {
   if (cvData.experience) updateData.experience = cvData.experience;
   if (cvData.education) updateData.education = cvData.education;
   if (cvData.skills) updateData.skills = cvData.skills;
+  if (cvData.languages) updateData.languages = cvData.languages;
+  if (cvData.interests) updateData.interests = cvData.interests;
+  if (cvData.certifications) updateData.certifications = cvData.certifications;
+  if (cvData.projects) updateData.projects = cvData.projects;
+  if (cvData.photo_url !== undefined) updateData.photo_url = cvData.photo_url;
 
   const { data, error } = await supabase
     .from("cvs")

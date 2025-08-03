@@ -111,13 +111,18 @@ export type Database = {
       }
       cvs: {
         Row: {
+          certifications: Json | null
           created_at: string
           education: Json
           experience: Json
           id: string
+          interests: Json | null
           is_published: boolean | null
+          languages: Json | null
           last_exported_at: string | null
           personal_info: Json
+          photo_url: string | null
+          projects: Json | null
           skills: Json
           template_id: string | null
           title: string
@@ -125,13 +130,18 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          certifications?: Json | null
           created_at?: string
           education?: Json
           experience?: Json
           id?: string
+          interests?: Json | null
           is_published?: boolean | null
+          languages?: Json | null
           last_exported_at?: string | null
           personal_info?: Json
+          photo_url?: string | null
+          projects?: Json | null
           skills?: Json
           template_id?: string | null
           title: string
@@ -139,13 +149,18 @@ export type Database = {
           user_id: string
         }
         Update: {
+          certifications?: Json | null
           created_at?: string
           education?: Json
           experience?: Json
           id?: string
+          interests?: Json | null
           is_published?: boolean | null
+          languages?: Json | null
           last_exported_at?: string | null
           personal_info?: Json
+          photo_url?: string | null
+          projects?: Json | null
           skills?: Json
           template_id?: string | null
           title?: string
