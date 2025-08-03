@@ -23,7 +23,8 @@ import {
   Sparkles,
   Upload,
   Mail,
-  Wand2
+  Wand2,
+  Edit3
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -38,6 +39,7 @@ import CVDisplay from "@/components/CVDisplay";
 import PhotoUpload from "@/components/PhotoUpload";
 import SpellChecker from "@/components/SpellChecker";
 import CVEnhancedBuilder from "@/components/CVEnhancedBuilder";
+import CVInlineEditor from "@/components/CVInlineEditor";
 import { ProgressIndicator } from "@/components/ProgressIndicator";
 import { useAutoSave } from "@/hooks/useAutoSave";
 import { toastActions } from "@/components/EnhancedToast";
