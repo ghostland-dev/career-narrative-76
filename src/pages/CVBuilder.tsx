@@ -41,6 +41,7 @@ import SpellChecker from "@/components/SpellChecker";
 import CVEnhancedBuilder from "@/components/CVEnhancedBuilder";
 import CVInlineEditor from "@/components/CVInlineEditor";
 import SpacingControls from "@/components/SpacingControls";
+import TemplateSelector from "@/components/TemplateSelector";
 import { ProgressIndicator } from "@/components/ProgressIndicator";
 import { useAutoSave } from "@/hooks/useAutoSave";
 import { toastActions } from "@/components/EnhancedToast";
@@ -56,6 +57,19 @@ const CVBuilder = () => {
   const [showTextParserDialog, setShowTextParserDialog] = useState(false);
   const [currentTab, setCurrentTab] = useState('personal');
   const [autoSaveEnabled, setAutoSaveEnabled] = useState(true);
+  const [templateStyle, setTemplateStyle] = useState<"modern" | "classic" | "minimal" | "print" | "creative" | "professional" | "elegant" | "tech">("modern");
+  
+  // Spacing settings
+  const [spacingSettings, setSpacingSettings] = useState({
+    pageMargin: 32,
+    sectionSpacing: 24,
+    itemSpacing: 16,
+    lineHeight: 1.5,
+    headerPadding: 16,
+    contentPadding: 16,
+    borderRadius: 8,
+    fontSize: 14
+  });
 
   const [cvData, setCvData] = useState<CVData["personal_info"] & { 
     experience: CVData["experience"], 
@@ -93,7 +107,7 @@ const CVBuilder = () => {
       if (id && cvData) {
         const cvDataToSave = {
           title: cvTitle || "Mon CV",
-          template_id: "modern",
+          template_id: templateStyle,
         personal_info: {
           fullName: cvData.fullName,
           email: cvData.email,
@@ -140,6 +154,7 @@ const CVBuilder = () => {
     try {
       const cv = await getCV(id);
       setCvTitle(cv.title);
+      setTemplateStyle(cv.template_id as any || "modern");
       const personalInfo = cv.personal_info as any;
       const experience = cv.experience as any[];
       const education = cv.education as any[];
@@ -287,7 +302,7 @@ const CVBuilder = () => {
     try {
       const cvDataToSave = {
         title: cvTitle || "Mon CV",
-        template_id: "modern",
+        template_id: templateStyle,
         personal_info: {
           fullName: cvData.fullName,
           email: cvData.email,
@@ -833,19 +848,49 @@ const CVBuilder = () => {
                     <div className="text-center mb-6">
                       <h3 className="text-lg font-semibold mb-2">Révision et amélioration</h3>
                       <p className="text-muted-foreground">
-                        Vérifiez l'orthographe et la grammaire de votre CV avant finalisation
+                        Optimisez le style et la mise en page de votre CV
                       </p>
                     </div>
                     
-                    <SpellChecker 
-                      text={`${cvData.fullName} ${cvData.summary} ${cvData.experience.map(exp => `${exp.title} ${exp.description}`).join(' ')} ${cvData.education.map(edu => `${edu.degree} ${edu.description}`).join(' ')}`}
-                      onCorrectedText={(correctedText) => {
-                        toast({
-                          title: "Corrections appliquées",
-                          description: "Consultez les modifications dans les sections correspondantes.",
-                        });
-                      }}
+                    {/* Template Selector */}
+                    <TemplateSelector 
+                      currentTemplate={templateStyle}
+                      onTemplateChange={(template) => setTemplateStyle(template as any)}
                     />
+                    
+                    <Separator className="my-6" />
+                    
+                    {/* Spacing Controls */}
+                    <SpacingControls 
+                      settings={spacingSettings}
+                      onSettingsChange={setSpacingSettings}
+                      onReset={() => setSpacingSettings({
+                        pageMargin: 32,
+                        sectionSpacing: 24,
+                        itemSpacing: 16,
+                        lineHeight: 1.5,
+                        headerPadding: 16,
+                        contentPadding: 16,
+                        borderRadius: 8,
+                        fontSize: 14
+                      })}
+                    />
+                    
+                    <Separator className="my-6" />
+                    
+                    {/* Spell Checker */}
+                    <div className="space-y-4">
+                      <h4 className="text-md font-semibold">Vérification orthographique</h4>
+                      <SpellChecker 
+                        text={`${cvData.fullName} ${cvData.summary} ${cvData.experience.map(exp => `${exp.title} ${exp.description}`).join(' ')} ${cvData.education.map(edu => `${edu.degree} ${edu.description}`).join(' ')}`}
+                        onCorrectedText={(correctedText) => {
+                          toast({
+                            title: "Corrections appliquées",
+                            description: "Consultez les modifications dans les sections correspondantes.",
+                          });
+                        }}
+                      />
+                    </div>
                   </TabsContent>
                 </Tabs>
               </div>
@@ -897,7 +942,8 @@ const CVBuilder = () => {
                   interests={cvData.interests}
                   certifications={cvData.certifications}
                   projects={cvData.projects}
-                  templateStyle="modern"
+                  templateStyle={templateStyle}
+                  spacingSettings={spacingSettings}
                 />
               </div>
             </div>

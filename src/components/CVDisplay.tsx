@@ -53,7 +53,7 @@ interface CVDisplayProps {
   interests?: string[];
   certifications?: Array<{ id: string; name: string; issuer: string; date: string; url?: string; }>;
   projects?: Array<{ id: string; name: string; description: string; technologies: string; url?: string; date: string; }>;
-  templateStyle?: "modern" | "classic" | "minimal" | "print";
+  templateStyle?: "modern" | "classic" | "minimal" | "print" | "creative" | "professional" | "elegant" | "tech";
   spacingSettings?: SpacingSettings;
 }
 
@@ -102,13 +102,74 @@ const CVDisplay: React.FC<CVDisplayProps> = ({
 
   // Styles optimisés pour A4
   const baseStyles = "text-gray-800 leading-tight";
-  const headerStyles = templateStyle === "modern" 
-    ? "bg-gradient-to-r from-primary/10 to-primary/5 border-l-4 border-primary"
-    : "border-b-2 border-primary";
+  
+  const getTemplateStyles = () => {
+    switch (templateStyle) {
+      case "modern":
+        return {
+          headerStyles: "bg-gradient-to-r from-primary/10 to-primary/5 border-l-4 border-primary",
+          containerBg: "bg-white",
+          accentColor: "text-primary",
+          cardStyle: "bg-gray-50 border-l-3 border-primary/30"
+        };
+      case "classic":
+        return {
+          headerStyles: "border-b-2 border-gray-800 bg-gray-50",
+          containerBg: "bg-white",
+          accentColor: "text-gray-800",
+          cardStyle: "bg-white border border-gray-200"
+        };
+      case "minimal":
+        return {
+          headerStyles: "border-b border-gray-300",
+          containerBg: "bg-white",
+          accentColor: "text-gray-700",
+          cardStyle: "bg-white"
+        };
+      case "creative":
+        return {
+          headerStyles: "bg-gradient-to-r from-purple-100 to-pink-100 border-l-4 border-purple-500 rounded-r-lg",
+          containerBg: "bg-gradient-to-br from-white to-purple-50",
+          accentColor: "text-purple-600",
+          cardStyle: "bg-gradient-to-r from-purple-50 to-pink-50 border-l-3 border-purple-400 rounded"
+        };
+      case "professional":
+        return {
+          headerStyles: "bg-slate-100 border-l-4 border-slate-600",
+          containerBg: "bg-white",
+          accentColor: "text-slate-700",
+          cardStyle: "bg-slate-50 border border-slate-200 rounded"
+        };
+      case "elegant":
+        return {
+          headerStyles: "bg-gradient-to-r from-amber-50 to-yellow-50 border-l-4 border-amber-500",
+          containerBg: "bg-gradient-to-b from-white to-amber-50/30",
+          accentColor: "text-amber-700",
+          cardStyle: "bg-white border border-amber-200 rounded-lg shadow-sm"
+        };
+      case "tech":
+        return {
+          headerStyles: "bg-gradient-to-r from-blue-100 to-cyan-100 border-l-4 border-blue-500",
+          containerBg: "bg-gradient-to-br from-white to-blue-50/50",
+          accentColor: "text-blue-600",
+          cardStyle: "bg-blue-50/50 border border-blue-200 rounded-md"
+        };
+      case "print":
+      default:
+        return {
+          headerStyles: "border-b-2 border-primary",
+          containerBg: "bg-white",
+          accentColor: "text-primary",
+          cardStyle: "bg-gray-50 border-l-3 border-primary/30"
+        };
+    }
+  };
+
+  const styles = getTemplateStyles();
 
   return (
     <div 
-      className="w-full mx-auto bg-white text-black print:m-0 print:max-w-none print:w-auto print:break-inside-avoid"
+      className={`w-full mx-auto text-black print:m-0 print:max-w-none print:w-auto print:break-inside-avoid ${styles.containerBg}`}
       style={{ 
         minHeight: templateStyle === "print" ? "297mm" : "auto", 
         maxWidth: templateStyle === "print" ? "210mm" : "none",
@@ -119,7 +180,7 @@ const CVDisplay: React.FC<CVDisplayProps> = ({
     >
       {/* En-tête optimisé */}
       <header 
-        className={`${templateStyle === "modern" ? "bg-gradient-to-r from-primary/5 to-primary/10" : ""} print:break-inside-avoid`}
+        className={`${styles.headerStyles} print:break-inside-avoid`}
         style={{ 
           padding: `${spacing.headerPadding}px`,
           marginBottom: `${spacing.sectionSpacing}px`,
@@ -150,7 +211,7 @@ const CVDisplay: React.FC<CVDisplayProps> = ({
               )}
             </h1>
             {personalInfo.summary && (
-              <p className="text-lg text-primary font-medium italic mb-3">
+              <p className={`text-lg font-medium italic mb-3 ${styles.accentColor}`}>
                 {personalInfo.summary.split('.')[0]}
               </p>
             )}
@@ -159,31 +220,31 @@ const CVDisplay: React.FC<CVDisplayProps> = ({
             <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-gray-600">
               {personalInfo.email && (
                 <div className="flex items-center">
-                  <Mail className="h-3.5 w-3.5 mr-1.5 text-primary" />
+                  <Mail className={`h-3.5 w-3.5 mr-1.5 ${styles.accentColor}`} />
                   <span>{personalInfo.email}</span>
                 </div>
               )}
               {personalInfo.phone && (
                 <div className="flex items-center">
-                  <Phone className="h-3.5 w-3.5 mr-1.5 text-primary" />
+                  <Phone className={`h-3.5 w-3.5 mr-1.5 ${styles.accentColor}`} />
                   <span>{personalInfo.phone}</span>
                 </div>
               )}
               {personalInfo.address && (
                 <div className="flex items-center">
-                  <MapPin className="h-3.5 w-3.5 mr-1.5 text-primary" />
+                  <MapPin className={`h-3.5 w-3.5 mr-1.5 ${styles.accentColor}`} />
                   <span>{personalInfo.address}</span>
                 </div>
               )}
               {personalInfo.website && (
                 <div className="flex items-center">
-                  <Globe className="h-3.5 w-3.5 mr-1.5 text-primary" />
+                  <Globe className={`h-3.5 w-3.5 mr-1.5 ${styles.accentColor}`} />
                   <span>{personalInfo.website}</span>
                 </div>
               )}
               {personalInfo.linkedin && (
                 <div className="flex items-center">
-                  <Linkedin className="h-3.5 w-3.5 mr-1.5 text-primary" />
+                  <Linkedin className={`h-3.5 w-3.5 mr-1.5 ${styles.accentColor}`} />
                   <span>{personalInfo.linkedin}</span>
                 </div>
               )}
@@ -202,7 +263,7 @@ const CVDisplay: React.FC<CVDisplayProps> = ({
           {/* Résumé professionnel */}
           {personalInfo.summary && (
             <section>
-              <h2 className={`text-lg font-bold text-primary mb-2 pb-1 ${headerStyles}`}>
+              <h2 className={`text-lg font-bold mb-2 pb-1 ${styles.accentColor} ${styles.headerStyles}`}>
                 Profil Professionnel
               </h2>
               <p className="text-sm text-gray-700 leading-relaxed">
@@ -214,7 +275,7 @@ const CVDisplay: React.FC<CVDisplayProps> = ({
           {/* Expérience professionnelle */}
           {experience.length > 0 && (
             <section>
-              <h2 className={`text-lg font-bold text-primary mb-3 pb-1 ${headerStyles}`}>
+              <h2 className={`text-lg font-bold mb-3 pb-1 ${styles.accentColor} ${styles.headerStyles}`}>
                 Expérience Professionnelle
               </h2>
               <div className="space-y-4">
@@ -224,7 +285,7 @@ const CVDisplay: React.FC<CVDisplayProps> = ({
                       <h3 className="text-base font-semibold text-gray-900 leading-tight">
                         {exp.title}
                       </h3>
-                      <div className="text-sm text-primary font-medium">
+                      <div className={`text-sm font-medium ${styles.accentColor}`}>
                         {exp.company} {exp.location && `• ${exp.location}`}
                       </div>
                       <div className="text-xs text-gray-600 flex items-center mt-1">
@@ -246,7 +307,7 @@ const CVDisplay: React.FC<CVDisplayProps> = ({
           {/* Formation */}
           {education.length > 0 && (
             <section>
-              <h2 className={`text-lg font-bold text-primary mb-3 pb-1 ${headerStyles}`}>
+              <h2 className={`text-lg font-bold mb-3 pb-1 ${styles.accentColor} ${styles.headerStyles}`}>
                 Formation
               </h2>
               <div className="space-y-3">
@@ -255,7 +316,7 @@ const CVDisplay: React.FC<CVDisplayProps> = ({
                     <h3 className="text-base font-semibold text-gray-900 leading-tight">
                       {edu.degree}
                     </h3>
-                    <div className="text-sm text-primary font-medium">
+                    <div className={`text-sm font-medium ${styles.accentColor}`}>
                       {edu.institution} {edu.location && `• ${edu.location}`}
                     </div>
                     <div className="text-xs text-gray-600 flex items-center mt-1">
@@ -276,7 +337,7 @@ const CVDisplay: React.FC<CVDisplayProps> = ({
           {/* Projets */}
           {projects.length > 0 && (
             <section>
-              <h2 className={`text-lg font-bold text-primary mb-3 pb-1 ${headerStyles}`}>
+              <h2 className={`text-lg font-bold mb-3 pb-1 ${styles.accentColor} ${styles.headerStyles}`}>
                 Projets
               </h2>
               <div className="space-y-3">
@@ -293,7 +354,7 @@ const CVDisplay: React.FC<CVDisplayProps> = ({
                     </p>
                     <div className="flex flex-wrap gap-1">
                       {project.technologies.split(',').map((tech, techIndex) => (
-                        <span key={techIndex} className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded">
+                        <span key={techIndex} className={`text-xs px-2 py-0.5 rounded ${styles.cardStyle.includes('bg-') ? styles.cardStyle.split(' ')[0] + '/20' : 'bg-primary/10'} ${styles.accentColor}`}>
                           {tech.trim()}
                         </span>
                       ))}
@@ -310,14 +371,14 @@ const CVDisplay: React.FC<CVDisplayProps> = ({
           {/* Compétences */}
           {skills.length > 0 && (
             <section>
-              <h2 className={`text-lg font-bold text-primary mb-3 pb-1 ${headerStyles}`}>
+              <h2 className={`text-lg font-bold mb-3 pb-1 ${styles.accentColor} ${styles.headerStyles}`}>
                 Compétences
               </h2>
               <div className="space-y-2">
                 {skills.map((skill, index) => (
                   <div
                     key={index}
-                    className="text-sm bg-gray-50 px-3 py-1.5 rounded-md border-l-3 border-primary/30"
+                    className={`text-sm px-3 py-1.5 rounded-md ${styles.cardStyle}`}
                   >
                     {skill}
                   </div>
@@ -329,14 +390,14 @@ const CVDisplay: React.FC<CVDisplayProps> = ({
           {/* Langues */}
           {languages.length > 0 && (
             <section>
-              <h2 className={`text-base font-bold text-primary mb-2 pb-1 ${headerStyles}`}>
+              <h2 className={`text-base font-bold mb-2 pb-1 ${styles.accentColor} ${styles.headerStyles}`}>
                 Langues
               </h2>
               <div className="space-y-1 text-sm text-gray-700">
                 {languages.map((language, index) => (
                   <div key={index} className="flex justify-between">
                     <span>{language.name}</span>
-                    <span className="text-primary font-medium">{language.level}</span>
+                    <span className={`font-medium ${styles.accentColor}`}>{language.level}</span>
                   </div>
                 ))}
               </div>
@@ -346,7 +407,7 @@ const CVDisplay: React.FC<CVDisplayProps> = ({
           {/* Certifications */}
           {certifications.length > 0 && (
             <section>
-              <h2 className={`text-base font-bold text-primary mb-2 pb-1 ${headerStyles}`}>
+              <h2 className={`text-base font-bold mb-2 pb-1 ${styles.accentColor} ${styles.headerStyles}`}>
                 Certifications
               </h2>
               <div className="space-y-2">
@@ -364,7 +425,7 @@ const CVDisplay: React.FC<CVDisplayProps> = ({
           {/* Centres d'intérêt */}
           {interests.length > 0 && (
             <section>
-              <h2 className={`text-base font-bold text-primary mb-2 pb-1 ${headerStyles}`}>
+              <h2 className={`text-base font-bold mb-2 pb-1 ${styles.accentColor} ${styles.headerStyles}`}>
                 Centres d'intérêt
               </h2>
               <div className="text-sm text-gray-700 space-y-1">
