@@ -34,6 +34,7 @@ import LoadingScreen from "@/components/LoadingScreen";
 import AIOptimizer from "@/components/AIOptimizer";
 import CoverLetterGenerator from "@/components/CoverLetterGenerator";
 import CVTextParser from "@/components/CVTextParser";
+import CVDisplay from "@/components/CVDisplay";
 
 const CVBuilder = () => {
   const navigate = useNavigate();
@@ -706,95 +707,28 @@ const CVBuilder = () => {
           </div>
         </div>
 
-        {/* CV Preview */}
+        {/* CV Preview - Optimisé pour A4 */}
         <div className="mt-12">
           <Card className="border-0 shadow-modern">
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4 flex items-center">
                 <Eye className="h-5 w-5 mr-2 text-primary" />
-                Aperçu du CV
+                Aperçu du CV (Format A4)
               </h3>
-              <div id="cv-preview" className="bg-white p-8 rounded-lg border min-h-[600px] font-inter">
-                <div className="space-y-6">
-                  {/* Header */}
-                  <div className="text-center pb-6 border-b border-gray-200">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                      {cvData.fullName || "Votre nom"}
-                    </h1>
-                    <div className="flex justify-center space-x-4 text-sm text-gray-600">
-                      {cvData.email && <span>{cvData.email}</span>}
-                      {cvData.phone && <span>{cvData.phone}</span>}
-                      {cvData.address && <span>{cvData.address}</span>}
-                    </div>
-                  </div>
-
-                  {/* Summary */}
-                  {cvData.summary && (
-                    <div>
-                      <h2 className="text-lg font-semibold text-gray-900 mb-3">Profil professionnel</h2>
-                      <p className="text-gray-700 leading-relaxed">{cvData.summary}</p>
-                    </div>
-                  )}
-
-                  {/* Experience */}
-                  {cvData.experience.length > 0 && (
-                    <div>
-                      <h2 className="text-lg font-semibold text-gray-900 mb-4">Expérience professionnelle</h2>
-                      <div className="space-y-4">
-                        {cvData.experience.map((exp) => (
-                          <div key={exp.id} className="border-l-2 border-blue-500 pl-4">
-                            <h3 className="font-semibold text-gray-900">{exp.title}</h3>
-                            <p className="text-blue-600 font-medium">{exp.company}</p>
-                            <p className="text-sm text-gray-600 mb-2">
-                              {exp.startDate} - {exp.endDate || "Présent"} • {exp.location}
-                            </p>
-                            {exp.description && (
-                              <p className="text-gray-700 text-sm leading-relaxed">{exp.description}</p>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Education */}
-                  {cvData.education.length > 0 && (
-                    <div>
-                      <h2 className="text-lg font-semibold text-gray-900 mb-4">Formation</h2>
-                      <div className="space-y-3">
-                        {cvData.education.map((edu) => (
-                          <div key={edu.id}>
-                            <h3 className="font-semibold text-gray-900">{edu.degree}</h3>
-                            <p className="text-blue-600 font-medium">{edu.institution}</p>
-                            <p className="text-sm text-gray-600">
-                              {edu.startDate} - {edu.endDate} • {edu.location}
-                            </p>
-                            {edu.description && (
-                              <p className="text-gray-700 text-sm mt-1">{edu.description}</p>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Skills */}
-                  {cvData.skills.length > 0 && (
-                    <div>
-                      <h2 className="text-lg font-semibold text-gray-900 mb-3">Compétences</h2>
-                      <div className="flex flex-wrap gap-2">
-                        {cvData.skills.map((skill, index) => (
-                          <span
-                            key={index}
-                            className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium"
-                          >
-                            {skill}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
+              <div id="cv-preview" className="overflow-hidden rounded-lg border">
+                <CVDisplay
+                  personalInfo={{
+                    fullName: cvData.fullName,
+                    email: cvData.email,
+                    phone: cvData.phone,
+                    address: cvData.address,
+                    summary: cvData.summary
+                  }}
+                  experience={cvData.experience}
+                  education={cvData.education}
+                  skills={cvData.skills}
+                  templateStyle="modern"
+                />
               </div>
             </div>
           </Card>

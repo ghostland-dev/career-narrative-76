@@ -25,6 +25,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { getCV } from "@/lib/cv-service";
 import { exportToPDF } from "@/lib/pdf-export";
+import CVDisplay from "@/components/CVDisplay";
 
 const CVPreview = () => {
   const navigate = useNavigate();
@@ -193,132 +194,16 @@ const CVPreview = () => {
             </div>
           </div>
 
-          {/* CV Content */}
-          <Card className="border-0 shadow-elegant">
-            <CardContent id="cv-preview-content" className="p-12 bg-white text-black min-h-[842px]">
-              {/* Header */}
-              <div className="text-center mb-8">
-                <h1 className="text-4xl font-bold text-gray-900 mb-2">
-                  {personalInfo.fullName || "Nom non renseigné"}
-                </h1>
-                <div className="flex flex-wrap justify-center items-center gap-4 text-gray-600">
-                  {personalInfo.email && (
-                    <div className="flex items-center">
-                      <Mail className="h-4 w-4 mr-2" />
-                      <span>{personalInfo.email}</span>
-                    </div>
-                  )}
-                  {personalInfo.phone && (
-                    <div className="flex items-center">
-                      <Phone className="h-4 w-4 mr-2" />
-                      <span>{personalInfo.phone}</span>
-                    </div>
-                  )}
-                  {personalInfo.address && (
-                    <div className="flex items-center">
-                      <MapPin className="h-4 w-4 mr-2" />
-                      <span>{personalInfo.address}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Summary */}
-              {personalInfo.summary && (
-                <div className="mb-8">
-                  <h2 className="text-2xl font-bold text-primary mb-4 border-b-2 border-primary pb-2">
-                    Résumé Professionnel
-                  </h2>
-                  <p className="text-gray-700 leading-relaxed">
-                    {personalInfo.summary}
-                  </p>
-                </div>
-              )}
-
-              {/* Experience */}
-              {experience.length > 0 && (
-                <div className="mb-8">
-                  <h2 className="text-2xl font-bold text-primary mb-4 border-b-2 border-primary pb-2">
-                    Expérience Professionnelle
-                  </h2>
-                  <div className="space-y-6">
-                    {experience.map((exp, index) => (
-                      <div key={index} className="relative pl-6 border-l-2 border-gray-200">
-                        <div className="absolute w-4 h-4 bg-primary rounded-full -left-2 top-1"></div>
-                        <div className="mb-2">
-                          <h3 className="text-xl font-semibold text-gray-900">
-                            {exp.title}
-                          </h3>
-                          <div className="text-lg text-primary font-medium">
-                            {exp.company} • {exp.location}
-                          </div>
-                          <div className="text-gray-600 flex items-center">
-                            <Calendar className="h-4 w-4 mr-2" />
-                            {formatDate(exp.startDate)} - {formatDate(exp.endDate)}
-                          </div>
-                        </div>
-                        {exp.description && (
-                          <p className="text-gray-700 leading-relaxed">
-                            {exp.description}
-                          </p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Education */}
-              {education.length > 0 && (
-                <div className="mb-8">
-                  <h2 className="text-2xl font-bold text-primary mb-4 border-b-2 border-primary pb-2">
-                    Formation
-                  </h2>
-                  <div className="space-y-6">
-                    {education.map((edu, index) => (
-                      <div key={index} className="relative pl-6 border-l-2 border-gray-200">
-                        <div className="absolute w-4 h-4 bg-primary rounded-full -left-2 top-1"></div>
-                        <div className="mb-2">
-                          <h3 className="text-xl font-semibold text-gray-900">
-                            {edu.degree}
-                          </h3>
-                          <div className="text-lg text-primary font-medium">
-                            {edu.institution} • {edu.location}
-                          </div>
-                          <div className="text-gray-600 flex items-center">
-                            <Calendar className="h-4 w-4 mr-2" />
-                            {formatDate(edu.startDate)} - {formatDate(edu.endDate)}
-                          </div>
-                        </div>
-                        {edu.description && (
-                          <p className="text-gray-700 leading-relaxed">
-                            {edu.description}
-                          </p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Skills */}
-              {skills.length > 0 && (
-                <div className="mb-8">
-                  <h2 className="text-2xl font-bold text-primary mb-4 border-b-2 border-primary pb-2">
-                    Compétences
-                  </h2>
-                  <div className="flex flex-wrap gap-3">
-                    {skills.map((skill, index) => (
-                      <span
-                        key={index}
-                        className="px-4 py-2 bg-primary/10 text-primary rounded-full font-medium"
-                      >
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
+          {/* CV Content - Optimisé pour A4 */}
+          <Card className="border-0 shadow-elegant print:shadow-none">
+            <CardContent id="cv-preview-content" className="p-0 print:p-0">
+              <CVDisplay
+                personalInfo={personalInfo}
+                experience={experience}
+                education={education}
+                skills={skills}
+                templateStyle="modern"
+              />
             </CardContent>
           </Card>
 
