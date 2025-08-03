@@ -697,11 +697,39 @@ const CVBuilder = () => {
                   <Eye className="h-4 w-4 mr-2 text-primary" />
                   Aperçu
                 </h3>
-                <div className="bg-muted/30 rounded-lg p-4 aspect-[3/4]">
-                  <div className="space-y-2">
-                    <div className="h-3 bg-primary/20 rounded w-3/4"></div>
-                    <div className="h-2 bg-muted rounded w-1/2"></div>
-                    <div className="h-2 bg-muted rounded w-2/3"></div>
+                <div className="bg-white rounded-lg border overflow-hidden" style={{ transform: 'scale(0.3)', transformOrigin: 'top left', width: '333%', height: '333%' }}>
+                  <div id="cv-preview" className="w-[210mm] h-[297mm] bg-white p-8">
+                    <CVDisplay
+                      personalInfo={{
+                        fullName: cvData.fullName,
+                        email: cvData.email,
+                        phone: cvData.phone,
+                        address: cvData.address,
+                        summary: cvData.summary,
+                        birthDate: cvData.birthDate,
+                        photo_url: cvData.photo_url
+                      }}
+                      experience={cvData.experience}
+                      education={cvData.education}
+                      skills={cvData.skills}
+                      languages={cvData.languages}
+                      interests={cvData.interests}
+                      certifications={cvData.certifications}
+                      projects={cvData.projects}
+                      templateStyle={templateStyle}
+                      spacingSettings={spacingSettings}
+                      designSystem={{
+                        font: designSettings.fontFamily,
+                        colors: {
+                          primary: designSettings.primaryColor,
+                          secondary: designSettings.secondaryColor,
+                          accent: "#0ea5e9",
+                          text: designSettings.textColor,
+                          background: designSettings.backgroundColor,
+                          muted: "#f1f5f9"
+                        }
+                      }}
+                    />
                   </div>
                 </div>
                 <Button size="sm" className="w-full mt-3" onClick={handlePreviewPDF}>
