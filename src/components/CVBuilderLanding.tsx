@@ -1,3 +1,5 @@
+import React from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -5,6 +7,7 @@ import { FileText, Sparkles, Download, Zap, Users, Globe, TrendingUp, CheckCircl
 import heroImage from "@/assets/hero-image.jpg";
 
 const CVBuilderLanding = () => {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
@@ -47,11 +50,11 @@ const CVBuilderLanding = () => {
               </div>
               
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button variant="hero" size="lg" className="text-lg px-8">
+                <Button variant="hero" size="lg" className="text-lg px-8" onClick={() => navigate("/auth")}>
                   <Zap className="w-5 h-5 mr-2" />
                   Créer mon CV
                 </Button>
-                <Button variant="glass" size="lg" className="text-lg px-8">
+                <Button variant="glass" size="lg" className="text-lg px-8" onClick={() => navigate("/templates")}>
                   <FileText className="w-5 h-5 mr-2" />
                   Voir les exemples
                 </Button>
@@ -185,11 +188,11 @@ const CVBuilderLanding = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button variant="hero" size="lg" className="text-lg px-12">
+              <Button variant="hero" size="lg" className="text-lg px-12" onClick={() => navigate("/auth")}>
                 <Zap className="w-5 h-5 mr-2" />
                 Commencer gratuitement
               </Button>
-              <Button variant="outline" size="lg" className="text-lg px-12">
+              <Button variant="outline" size="lg" className="text-lg px-12" onClick={() => navigate("/templates")}>
                 Découvrir les fonctionnalités
               </Button>
             </div>

@@ -206,10 +206,20 @@ const Dashboard = () => {
               <UserIcon className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">{user?.email}</span>
             </div>
-            <Button variant="outline" size="sm" onClick={handleSignOut}>
-              <LogOut className="h-4 w-4 mr-2" />
-              Déconnexion
-            </Button>
+            <div className="flex items-center space-x-2">
+              <Button variant="ghost" size="sm" onClick={() => navigate("/profile")}>
+                <Settings className="h-4 w-4 mr-2" />
+                Profil
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => navigate("/support")}>
+                <HelpCircle className="h-4 w-4 mr-2" />
+                Aide
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleSignOut}>
+                <LogOut className="h-4 w-4 mr-2" />
+                Déconnexion
+              </Button>
+            </div>
           </div>
         </div>
       </header>
@@ -378,7 +388,7 @@ const Dashboard = () => {
                         </div>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <Button variant="outline" size="sm">
+                        <Button variant="outline" size="sm" onClick={() => navigate(`/cv-preview/${cv.id}`)}>
                           <Eye className="w-4 h-4 mr-2" />
                           Aperçu
                         </Button>

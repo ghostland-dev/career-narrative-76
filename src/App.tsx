@@ -1,3 +1,4 @@
+import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,6 +10,9 @@ import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import CVBuilder from "./pages/CVBuilder";
 import Templates from "./pages/Templates";
+import CVPreview from "./pages/CVPreview";
+import Profile from "./pages/Profile";
+import Support from "./pages/Support";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +29,9 @@ const App = () => (
           <Route path="/templates" element={<div><Templates /></div>} />
           <Route path="/cv-builder" element={<div><CVBuilder /></div>} />
           <Route path="/cv-builder/:id" element={<div><CVBuilder /></div>} />
+          <Route path="/cv-preview/:id" element={<div><CVPreview /></div>} />
+          <Route path="/profile" element={<div><Profile /></div>} />
+          <Route path="/support" element={<div><Support /></div>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
