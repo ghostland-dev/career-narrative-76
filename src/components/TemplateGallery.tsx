@@ -66,14 +66,23 @@ const TemplateGallery = ({ templates, onSelectTemplate, selectedTemplate }: Temp
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Galerie de Templates</h2>
-        <div className="flex items-center space-x-2">
+    <div className="space-y-8">
+      {/* Enhanced Filter Bar */}
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div>
+          <h2 className="text-3xl font-bold mb-2 bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">
+            Galerie de Templates
+          </h2>
+          <p className="text-muted-foreground">
+            {filteredTemplates.length} template{filteredTemplates.length > 1 ? 's' : ''} disponible{filteredTemplates.length > 1 ? 's' : ''}
+          </p>
+        </div>
+        <div className="flex items-center space-x-2 bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl p-2">
           <Button
             variant={selectedCategory === 'all' ? 'default' : 'ghost'}
             size="sm"
             onClick={() => setSelectedCategory('all')}
+            className={selectedCategory === 'all' ? 'bg-gradient-to-r from-primary to-primary-glow text-white shadow-none' : 'hover:bg-accent/10'}
           >
             Tous
           </Button>
@@ -81,6 +90,7 @@ const TemplateGallery = ({ templates, onSelectTemplate, selectedTemplate }: Temp
             variant={selectedCategory === 'free' ? 'default' : 'ghost'}
             size="sm"
             onClick={() => setSelectedCategory('free')}
+            className={selectedCategory === 'free' ? 'bg-gradient-to-r from-success to-accent text-white shadow-none' : 'hover:bg-accent/10'}
           >
             Gratuits
           </Button>
@@ -88,33 +98,45 @@ const TemplateGallery = ({ templates, onSelectTemplate, selectedTemplate }: Temp
             variant={selectedCategory === 'premium' ? 'default' : 'ghost'}
             size="sm"
             onClick={() => setSelectedCategory('premium')}
+            className={selectedCategory === 'premium' ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-none' : 'hover:bg-accent/10'}
           >
             Premium
           </Button>
         </div>
       </div>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredTemplates.map((template) => (
+      {/* Enhanced Grid Layout */}
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {filteredTemplates.map((template, index) => (
           <Card 
             key={template.id} 
-            className={`cursor-pointer transition-all hover:shadow-elegant ${
+            className={`group cursor-pointer transition-all duration-300 hover:scale-[1.02] ${
               selectedTemplate === template.id 
-                ? 'ring-2 ring-primary shadow-card' 
-                : 'border-0 shadow-card'
+                ? 'ring-2 ring-primary shadow-elegant bg-gradient-to-br from-card to-primary/5' 
+                : 'border-0 shadow-card hover:shadow-elegant bg-card/50 backdrop-blur-sm'
             }`}
             onClick={() => onSelectTemplate(template.id)}
+            style={{
+              animationDelay: `${index * 0.1}s`
+            }}
           >
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">{template.name}</CardTitle>
+                <CardTitle className="text-xl font-bold group-hover:text-primary transition-colors">
+                  {template.name}
+                </CardTitle>
                 {template.is_premium && (
-                  <Badge variant="secondary" className="bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0">
-                    Premium
+                  <Badge variant="secondary" className="bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0 shadow-glow animate-pulse">
+                    <span className="flex items-center space-x-1">
+                      <span className="w-2 h-2 bg-yellow-300 rounded-full"></span>
+                      <span>Premium</span>
+                    </span>
                   </Badge>
                 )}
               </div>
-              <CardDescription>{template.description}</CardDescription>
+              <CardDescription className="text-muted-foreground">
+                {template.description}
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Template Preview */}
@@ -128,29 +150,50 @@ const TemplateGallery = ({ templates, onSelectTemplate, selectedTemplate }: Temp
                 ) : (
                   getTemplatePreview(template)
                 )}
-                <div className="absolute inset-0 bg-black/0 hover:bg-black/10 transition-colors rounded-lg flex items-center justify-center opacity-0 hover:opacity-100">
-                  <div className="flex items-center space-x-2 bg-black/20 backdrop-blur-sm rounded-lg px-3 py-2">
-                    <Eye className="h-4 w-4 text-white" />
-                    <span className="text-white text-sm">Aperçu</span>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-lg flex items-center justify-center">
+                  <div className="bg-black/30 backdrop-blur-md rounded-xl px-4 py-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                    <div className="flex items-center space-x-2 text-white">
+                      <Eye className="h-4 w-4" />
+                      <span className="text-sm font-medium">Aperçu détaillé</span>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Template Features */}
-              <div className="flex items-center justify-between pt-2">
-                <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                  <Palette className="h-4 w-4" />
-                  <span>{template.styles?.layout || 'Standard'}</span>
+              {/* Enhanced Template Features */}
+              <div className="flex items-center justify-between pt-3 border-t border-border/50">
+                <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                    <Palette className="h-4 w-4" />
+                    <span className="font-medium">{template.styles?.layout || 'Standard'}</span>
+                  </div>
+                  {selectedTemplate === template.id && (
+                    <div className="flex items-center space-x-1 text-success text-sm font-medium">
+                      <div className="w-2 h-2 bg-success rounded-full animate-pulse"></div>
+                      <span>Sélectionné</span>
+                    </div>
+                  )}
                 </div>
                 <Button 
                   size="sm" 
                   variant={selectedTemplate === template.id ? "default" : "outline"}
+                  className={selectedTemplate === template.id 
+                    ? "bg-gradient-to-r from-primary to-primary-glow text-white shadow-glow" 
+                    : "border-border/50 hover:bg-accent/10 hover:border-primary/30"
+                  }
                   onClick={(e) => {
                     e.stopPropagation();
                     onSelectTemplate(template.id);
                   }}
                 >
-                  {selectedTemplate === template.id ? 'Sélectionné' : 'Utiliser'}
+                  {selectedTemplate === template.id ? (
+                    <span className="flex items-center space-x-2">
+                      <div className="w-3 h-3 bg-white rounded-full"></div>
+                      <span>Choisi</span>
+                    </span>
+                  ) : (
+                    'Utiliser'
+                  )}
                 </Button>
               </div>
             </CardContent>
@@ -158,13 +201,17 @@ const TemplateGallery = ({ templates, onSelectTemplate, selectedTemplate }: Temp
         ))}
       </div>
 
+      {/* Enhanced Empty State */}
       {filteredTemplates.length === 0 && (
-        <Card className="border-0 shadow-card">
-          <CardContent className="text-center py-12">
-            <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Aucun template trouvé</h3>
-            <p className="text-muted-foreground">
-              Aucun template ne correspond à vos critères de recherche.
+        <Card className="border-0 shadow-card bg-card/50 backdrop-blur-sm">
+          <CardContent className="text-center py-16">
+            <div className="w-20 h-20 bg-gradient-to-br from-muted to-accent/20 rounded-2xl mx-auto mb-6 flex items-center justify-center">
+              <FileText className="h-10 w-10 text-muted-foreground" />
+            </div>
+            <h3 className="text-2xl font-bold mb-3">Aucun template trouvé</h3>
+            <p className="text-muted-foreground max-w-md mx-auto">
+              Aucun template ne correspond à vos critères. Essayez de modifier vos filtres ou 
+              <span className="text-primary font-medium"> créez un CV sans template</span>.
             </p>
           </CardContent>
         </Card>
