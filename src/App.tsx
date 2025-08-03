@@ -4,9 +4,11 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HelmetProvider } from 'react-helmet-async';
 import ErrorBoundary from "@/components/ErrorBoundary";
 import LoadingScreen from "@/components/LoadingScreen";
 import NotificationManager from "@/components/NotificationManager";
+import UserActivityTracker from "@/components/analytics/UserActivityTracker";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
@@ -16,6 +18,8 @@ import Templates from "./pages/Templates";
 import CVPreview from "./pages/CVPreview";
 import Profile from "./pages/Profile";
 import Support from "./pages/Support";
+import Admin from "./pages/Admin";
+import Subscription from "./pages/Subscription";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -44,68 +48,81 @@ const App = () => {
   };
 
   return (
-    <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <BrowserRouter>
-            <Suspense fallback={<LoadingScreen message="Chargement de l'application..." />}>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/auth" element={
-                  <ErrorBoundary fallback={<LoadingScreen message="Erreur de chargement" variant="inline" />}>
-                    <Auth />
-                  </ErrorBoundary>
-                } />
-                <Route path="/dashboard" element={
-                  <ErrorBoundary>
-                    <Dashboard />
-                  </ErrorBoundary>
-                } />
-                <Route path="/templates" element={
-                  <ErrorBoundary>
-                    <Templates />
-                  </ErrorBoundary>
-                } />
-                <Route path="/cv-builder" element={
-                  <ErrorBoundary>
-                    <CVBuilder />
-                  </ErrorBoundary>
-                } />
-                <Route path="/cv-builder/:id" element={
-                  <ErrorBoundary>
-                    <CVBuilder />
-                  </ErrorBoundary>
-                } />
-                <Route path="/cv-preview/:id" element={
-                  <ErrorBoundary>
-                    <CVPreview />
-                  </ErrorBoundary>
-                } />
-                <Route path="/profile" element={
-                  <ErrorBoundary>
-                    <Profile />
-                  </ErrorBoundary>
-                } />
-                <Route path="/support" element={
-                  <ErrorBoundary>
-                    <Support />
-                  </ErrorBoundary>
-                } />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </Suspense>
-          </BrowserRouter>
-          
-          <NotificationManager 
-            notifications={notifications} 
-            onRemove={removeNotification} 
-          />
-          <Toaster />
-          <Sonner />
-        </TooltipProvider>
-      </QueryClientProvider>
-    </ErrorBoundary>
+    <HelmetProvider>
+      <ErrorBoundary>
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <BrowserRouter>
+              <UserActivityTracker />
+              <Suspense fallback={<LoadingScreen message="Chargement de l'application..." />}>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/auth" element={
+                    <ErrorBoundary fallback={<LoadingScreen message="Erreur de chargement" variant="inline" />}>
+                      <Auth />
+                    </ErrorBoundary>
+                  } />
+                  <Route path="/dashboard" element={
+                    <ErrorBoundary>
+                      <Dashboard />
+                    </ErrorBoundary>
+                  } />
+                  <Route path="/templates" element={
+                    <ErrorBoundary>
+                      <Templates />
+                    </ErrorBoundary>
+                  } />
+                  <Route path="/cv-builder" element={
+                    <ErrorBoundary>
+                      <CVBuilder />
+                    </ErrorBoundary>
+                  } />
+                  <Route path="/cv-builder/:id" element={
+                    <ErrorBoundary>
+                      <CVBuilder />
+                    </ErrorBoundary>
+                  } />
+                  <Route path="/cv-preview/:id" element={
+                    <ErrorBoundary>
+                      <CVPreview />
+                    </ErrorBoundary>
+                  } />
+                  <Route path="/profile" element={
+                    <ErrorBoundary>
+                      <Profile />
+                    </ErrorBoundary>
+                  } />
+                  <Route path="/support" element={
+                    <ErrorBoundary>
+                      <Support />
+                    </ErrorBoundary>
+                  } />
+                  <Route path="/admin" element={
+                    <ErrorBoundary>
+                      <Admin />
+                    </ErrorBoundary>
+                  } />
+                  <Route path="/subscription" element={
+                    <ErrorBoundary>
+                      <Subscription />
+                    </ErrorBoundary>
+                  } />
+                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Suspense>
+            </BrowserRouter>
+            
+            <NotificationManager 
+              notifications={notifications} 
+              onRemove={removeNotification} 
+            />
+            <Toaster />
+            <Sonner />
+          </TooltipProvider>
+        </QueryClientProvider>
+      </ErrorBoundary>
+    </HelmetProvider>
   );
 };
 

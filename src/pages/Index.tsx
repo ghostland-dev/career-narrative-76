@@ -1,7 +1,13 @@
 import CVBuilderLanding from "@/components/CVBuilderLanding";
+import SEOHead from "@/components/seo/SEOHead";
 
 const Index = () => {
-  return <CVBuilderLanding />;
+  return (
+    <>
+      <SEOHead />
+      <CVBuilderLanding />
+    </>
+  );
 };
 
 export default Index;

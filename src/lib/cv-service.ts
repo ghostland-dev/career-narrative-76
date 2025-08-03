@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { useActivityTracker } from "@/components/analytics/UserActivityTracker";
 
 export interface CVData {
   id?: string;

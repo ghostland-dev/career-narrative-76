@@ -14,7 +14,15 @@ serve(async (req) => {
   }
 
   try {
+    if (!geminiApiKey) {
+      throw new Error('GEMINI_API_KEY non configuré');
+    }
+
     const { action, data } = await req.json();
+    
+    if (!action || !data) {
+      throw new Error('Action et data requis');
+    }
     
     let prompt = '';
     
@@ -98,10 +106,18 @@ Retourne uniquement une liste de compétences séparées par des virgules, sans 
     });
 
     if (!response.ok) {
-      throw new Error(`Erreur API Gemini: ${response.status}`);
+      const errorText = await response.text();
+      console.error('Erreur Gemini:', response.status, errorText);
+      throw new Error(`Erreur API Gemini: ${response.status} - ${errorText}`);
     }
 
     const result = await response.json();
+    
+    if (!result.candidates || !result.candidates[0] || !result.candidates[0].content) {
+      console.error('Réponse Gemini invalide:', result);
+      throw new Error('Réponse Gemini invalide');
+    }
+    
     const generatedText = result.candidates[0].content.parts[0].text;
 
     return new Response(JSON.stringify({ 
