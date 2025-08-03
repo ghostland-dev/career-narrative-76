@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, FileText, Eye, Edit3, Download, LogOut, UserIcon, Trash2, Search } from "lucide-react";
+import { Plus, FileText, Eye, Edit3, Download, LogOut, UserIcon, Trash2, Search, Settings, HelpCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { getUserCVs, deleteCV, createCV, getTemplates, type CVTemplate } from "@/lib/cv-service";
