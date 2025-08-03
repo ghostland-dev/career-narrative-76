@@ -166,7 +166,7 @@ const CoverLetterInlineEditor: React.FC<CoverLetterInlineEditorProps> = ({
       )}
 
       {/* Prévisualisation de la lettre avec édition inline */}
-      <Card className="w-full bg-white">
+      <Card className="w-full bg-white" id="cover-letter-content">
         <CardContent className="p-6">
           {/* En-tête avec le même style que le CV */}
           <header className="bg-gradient-to-r from-primary/5 to-primary/10 p-4 mb-6 rounded-lg">

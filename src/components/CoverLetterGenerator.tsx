@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Sparkles, FileText, Download, Loader2, Edit3, Wand2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { exportToPDF } from '@/lib/pdf-export';
 import CoverLetterInlineEditor from './CoverLetterInlineEditor';
 
 interface CoverLetterGeneratorProps {
@@ -71,14 +72,21 @@ const CoverLetterGenerator: React.FC<CoverLetterGeneratorProps> = ({ cv, isOpen,
     }
   };
 
-  const downloadLetter = () => {
-    const element = document.createElement('a');
-    const file = new Blob([generatedLetter], { type: 'text/plain' });
-    element.href = URL.createObjectURL(file);
-    element.download = `lettre_motivation_${company || 'spontanee'}.txt`;
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
+  const downloadLetter = async () => {
+    try {
+      await exportToPDF('cover-letter-content', `Lettre_motivation_${company || 'spontanee'}.pdf`);
+      toast({
+        title: "Téléchargement réussi",
+        description: "La lettre de motivation a été exportée en PDF.",
+      });
+    } catch (error) {
+      console.error("Error exporting PDF:", error);
+      toast({
+        title: "Erreur d'export",
+        description: "Impossible d'exporter la lettre en PDF.",
+        variant: "destructive",
+      });
+    }
   };
 
   const resetForm = () => {
