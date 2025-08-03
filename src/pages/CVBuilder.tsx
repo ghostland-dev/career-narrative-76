@@ -38,6 +38,9 @@ import CVDisplay from "@/components/CVDisplay";
 import PhotoUpload from "@/components/PhotoUpload";
 import SpellChecker from "@/components/SpellChecker";
 import CVEnhancedBuilder from "@/components/CVEnhancedBuilder";
+import { ProgressIndicator } from "@/components/ProgressIndicator";
+import { useAutoSave } from "@/hooks/useAutoSave";
+import { toastActions } from "@/components/EnhancedToast";
 
 const CVBuilder = () => {
   const navigate = useNavigate();
@@ -48,6 +51,8 @@ const CVBuilder = () => {
   const [cvTitle, setCvTitle] = useState("");
   const [showCoverLetterDialog, setShowCoverLetterDialog] = useState(false);
   const [showTextParserDialog, setShowTextParserDialog] = useState(false);
+  const [currentTab, setCurrentTab] = useState('personal');
+  const [autoSaveEnabled, setAutoSaveEnabled] = useState(true);
 
   const [cvData, setCvData] = useState<CVData["personal_info"] & { 
     experience: CVData["experience"], 
@@ -75,6 +80,38 @@ const CVBuilder = () => {
   });
 
   const [newSkill, setNewSkill] = useState("");
+
+  // Auto-save functionality
+  useAutoSave({
+    data: cvData,
+    onSave: async () => {
+      if (id && cvData) {
+        const cvDataToSave = {
+          title: cvTitle || "Mon CV",
+          template_id: "modern",
+          personal_info: {
+            fullName: cvData.fullName,
+            email: cvData.email,
+            phone: cvData.phone,
+            address: cvData.address,
+            summary: cvData.summary
+          },
+          experience: cvData.experience,
+          education: cvData.education,
+          skills: cvData.skills,
+          languages: cvData.languages,
+          interests: cvData.interests,
+          certifications: cvData.certifications,
+          projects: cvData.projects,
+          photo_url: cvData.photo_url
+        };
+        await updateCV(id, cvDataToSave);
+        toastActions.autoSave();
+      }
+    },
+    enabled: autoSaveEnabled && !isSaving && !!id,
+    delay: 2000
+  });
 
   useEffect(() => {
     checkAuth();
@@ -132,10 +169,7 @@ const CVBuilder = () => {
 
   const handleOptimizedData = (optimizedData: any) => {
     setCvData(optimizedData);
-    toast({
-      title: "CV optimisé !",
-      description: "Les améliorations IA ont été appliquées avec succès.",
-    });
+    toastActions.optimizationComplete("CV");
   };
 
   const handleParsedData = (parsedData: any) => {
@@ -154,10 +188,7 @@ const CVBuilder = () => {
       projects: [],
       photo_url: undefined
     });
-    toast({
-      title: "Données importées !",
-      description: "Votre CV a été rempli automatiquement.",
-    });
+    toastActions.importSuccess();
   };
 
   const addExperience = () => {
@@ -243,6 +274,8 @@ const CVBuilder = () => {
 
   const handleSave = async () => {
     setIsSaving(true);
+    setAutoSaveEnabled(false);
+    
     try {
       const cvDataToSave = {
         title: cvTitle || "Mon CV",
@@ -266,19 +299,14 @@ const CVBuilder = () => {
 
       if (id) {
         await updateCV(id, cvDataToSave);
-        toast({
-          title: "CV sauvegardé",
-          description: "Vos modifications ont été enregistrées avec succès.",
-        });
+        toastActions.manualSave();
       } else {
         const newCV = await createCV(cvDataToSave);
-        toast({
-          title: "CV créé",
-          description: "Votre CV a été créé avec succès.",
-        });
+        toastActions.manualSave();
         navigate(`/cv-builder/${newCV.id}`);
       }
     } catch (error) {
+      toastActions.saveError();
       console.error("Error saving CV:", error);
       toast({
         title: "Erreur",
@@ -287,16 +315,14 @@ const CVBuilder = () => {
       });
     } finally {
       setIsSaving(false);
+      setTimeout(() => setAutoSaveEnabled(true), 1000);
     }
   };
 
   const handleExportPDF = async () => {
     try {
       await exportToPDF('cv-preview', `${cvTitle || 'CV'}.pdf`);
-      toast({
-        title: "Export réussi",
-        description: "Votre CV a été exporté en PDF.",
-      });
+      toastActions.exportSuccess();
     } catch (error) {
       console.error("Error exporting PDF:", error);
       toast({
@@ -368,8 +394,54 @@ const CVBuilder = () => {
     >
       <div className="container mx-auto px-4 py-6">
         <div className="grid lg:grid-cols-12 gap-8">
+          {/* Progress Indicator */}
+          <div className="lg:col-span-3">
+            <ProgressIndicator
+              sections={[
+                {
+                  id: 'personal',
+                  name: 'Informations personnelles',
+                  required: true,
+                  completed: !!(cvData?.fullName && cvData?.email)
+                },
+                {
+                  id: 'experience',
+                  name: 'Expérience professionnelle',
+                  required: true,
+                  completed: !!(cvData?.experience && cvData.experience.length > 0)
+                },
+                {
+                  id: 'education',
+                  name: 'Formation',
+                  required: true,
+                  completed: !!(cvData?.education && cvData.education.length > 0)
+                },
+                {
+                  id: 'skills',
+                  name: 'Compétences',
+                  required: false,
+                  completed: !!(cvData?.skills && cvData.skills.length > 0)
+                },
+                {
+                  id: 'additional',
+                  name: 'Informations supplémentaires',
+                  required: false,
+                  completed: !!(cvData?.languages?.length || cvData?.interests?.length || cvData?.certifications?.length || cvData?.projects?.length)
+                },
+                {
+                  id: 'review',
+                  name: 'Révision et optimisation',
+                  required: false,
+                  completed: false
+                }
+              ]}
+              currentSection={currentTab}
+              onSectionClick={setCurrentTab}
+            />
+          </div>
+          
           {/* Main Editor Panel */}
-          <div className="lg:col-span-8 space-y-6">
+          <div className="lg:col-span-9 space-y-6">
             {/* CV Title */}
             <Card className="border-0 shadow-modern">
               <div className="p-6">
@@ -387,7 +459,7 @@ const CVBuilder = () => {
             {/* Main Content Tabs */}
             <Card className="border-0 shadow-modern">
               <div className="p-6">
-                <Tabs defaultValue="personal" className="w-full">
+                <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
                   <TabsList className="grid w-full grid-cols-6 mb-6">
                     <TabsTrigger value="personal" className="text-sm font-medium">
                       <User className="h-4 w-4 mr-2" />
@@ -732,12 +804,10 @@ const CVBuilder = () => {
                     </div>
                   </TabsContent>
 
-                  {/* Nouvelle section pour les sections supplémentaires */}
                   <TabsContent value="additional" className="space-y-6">
                     <CVEnhancedBuilder cvData={cvData} setCvData={setCvData} />
                   </TabsContent>
 
-                  {/* Section de révision avec vérification orthographique */}
                   <TabsContent value="review" className="space-y-6">
                     <div className="text-center mb-6">
                       <h3 className="text-lg font-semibold mb-2">Révision et amélioration</h3>
@@ -749,7 +819,6 @@ const CVBuilder = () => {
                     <SpellChecker 
                       text={`${cvData.fullName} ${cvData.summary} ${cvData.experience.map(exp => `${exp.title} ${exp.description}`).join(' ')} ${cvData.education.map(edu => `${edu.degree} ${edu.description}`).join(' ')}`}
                       onCorrectedText={(correctedText) => {
-                        // Cette fonction pourrait être améliorée pour appliquer les corrections de manière plus sophistiquée
                         toast({
                           title: "Corrections appliquées",
                           description: "Consultez les modifications dans les sections correspondantes.",
@@ -761,7 +830,6 @@ const CVBuilder = () => {
               </div>
             </Card>
 
-            {/* Section Photo */}
             <PhotoUpload
               currentPhotoUrl={cvData.photo_url}
               onPhotoUpload={(photoUrl) => {
@@ -772,19 +840,17 @@ const CVBuilder = () => {
               }}
             />
           </div>
-
-          {/* AI Sidebar */}
-          <div className="lg:col-span-4">
-            <div className="sticky top-24">
-              <AIOptimizer 
-                cvData={cvData} 
-                onOptimizedData={handleOptimizedData} 
-              />
-            </div>
-          </div>
         </div>
 
-        {/* CV Preview - Optimisé pour A4 */}
+        {/* AI Optimizer */}
+        <div className="mt-8">
+          <AIOptimizer 
+            cvData={cvData} 
+            onOptimizedData={handleOptimizedData} 
+          />
+        </div>
+
+        {/* CV Preview */}
         <div className="mt-12">
           <Card className="border-0 shadow-modern">
             <div className="p-6">
@@ -815,6 +881,18 @@ const CVBuilder = () => {
             </div>
           </Card>
         </div>
+
+        {/* Floating Save Status */}
+        {autoSaveEnabled && (
+          <div className="fixed bottom-4 right-4 z-50">
+            <div className="bg-card border rounded-lg px-3 py-2 shadow-lg">
+              <div className="flex items-center space-x-2 text-sm">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <span className="text-muted-foreground">Sauvegarde automatique activée</span>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Dialogs */}
