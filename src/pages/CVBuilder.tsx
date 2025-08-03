@@ -42,6 +42,7 @@ import CVEnhancedBuilder from "@/components/CVEnhancedBuilder";
 import CVInlineEditor from "@/components/CVInlineEditor";
 import SpacingControls from "@/components/SpacingControls";
 import TemplateSelector from "@/components/TemplateSelector";
+import DesignSystem from "@/components/DesignSystem";
 import { ProgressIndicator } from "@/components/ProgressIndicator";
 import { useAutoSave } from "@/hooks/useAutoSave";
 import { toastActions } from "@/components/EnhancedToast";
@@ -846,11 +847,29 @@ const CVBuilder = () => {
 
                   <TabsContent value="review" className="space-y-6">
                     <div className="text-center mb-6">
-                      <h3 className="text-lg font-semibold mb-2">Révision et amélioration</h3>
+                      <h3 className="text-lg font-semibold mb-2">Design et personnalisation</h3>
                       <p className="text-muted-foreground">
-                        Optimisez le style et la mise en page de votre CV
+                        Personnalisez l'apparence et le style de votre CV
                       </p>
                     </div>
+                    
+                    {/* Design System */}
+                    <DesignSystem 
+                      onFontChange={(font) => {
+                        // Appliquer la police au CV
+                        console.log("Font changed:", font);
+                      }}
+                      onColorChange={(colors) => {
+                        // Appliquer les couleurs au CV
+                        console.log("Colors changed:", colors);
+                      }}
+                      onSpacingChange={(spacing) => {
+                        // Appliquer l'espacement au CV
+                        console.log("Spacing changed:", spacing);
+                      }}
+                    />
+                    
+                    <Separator className="my-6" />
                     
                     {/* Template Selector */}
                     <TemplateSelector 
