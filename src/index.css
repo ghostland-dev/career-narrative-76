@@ -17,8 +17,9 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 214 100% 47%;
+    --primary-foreground: 0 0% 98%;
+    --primary-glow: 214 100% 70%;
 
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
@@ -26,11 +27,27 @@ All colors MUST be HSL.
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 142 76% 36%;
+    --accent-foreground: 0 0% 98%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
+
+    /* Custom CV Builder Design Tokens */
+    --hero-gradient: linear-gradient(135deg, hsl(214 100% 47%), hsl(214 100% 70%));
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 98%;
+    --glass: 220 13% 91% / 0.8;
+    --glass-border: 220 13% 91% / 0.3;
+    
+    /* Professional Shadows */
+    --shadow-elegant: 0 10px 30px -10px hsl(214 100% 47% / 0.3);
+    --shadow-glow: 0 0 40px hsl(214 100% 70% / 0.4);
+    --shadow-card: 0 4px 20px -4px hsl(214 25% 20% / 0.15);
+    
+    /* Smooth Transitions */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
@@ -65,8 +82,9 @@ All colors MUST be HSL.
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 210 40% 98%;
+    --primary: 214 100% 60%;
     --primary-foreground: 222.2 47.4% 11.2%;
+    --primary-glow: 214 100% 75%;
 
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
