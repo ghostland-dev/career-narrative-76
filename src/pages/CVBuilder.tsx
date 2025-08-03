@@ -43,6 +43,7 @@ import CVInlineEditor from "@/components/CVInlineEditor";
 import SpacingControls from "@/components/SpacingControls";
 import TemplateSelector from "@/components/TemplateSelector";
 import DesignSystem from "@/components/DesignSystem";
+import DesignCustomizer from "@/components/DesignCustomizer";
 import { ProgressIndicator } from "@/components/ProgressIndicator";
 import { useAutoSave } from "@/hooks/useAutoSave";
 import { toastActions } from "@/components/EnhancedToast";
@@ -69,6 +70,21 @@ const CVBuilder = () => {
     text: "#1e293b",
     background: "#ffffff",
     muted: "#f1f5f9"
+  });
+  
+  // Advanced design settings
+  const [designSettings, setDesignSettings] = useState({
+    pageMargin: 2,
+    sectionSpacing: 2,
+    useCustomColors: false,
+    fontFamily: "Montserrat",
+    fontSize: "medium" as "small" | "medium" | "large",
+    lineHeight: 1.5,
+    backgroundStyle: "none" as "none" | "subtle" | "gradient",
+    primaryColor: "#2563eb",
+    secondaryColor: "#64748b",
+    textColor: "#1e293b",
+    backgroundColor: "#ffffff"
   });
   
   // Spacing settings
@@ -864,16 +880,15 @@ const CVBuilder = () => {
                       </p>
                     </div>
                     
-                    {/* Design System */}
-                    <DesignSystem 
-                      onFontChange={(font) => setCurrentFont(font)}
-                      onColorChange={(colors) => setColorPalette(colors)}
-                      onSpacingChange={(spacing) => setSpacingSettings(spacing)}
+                    {/* New Advanced Design Customizer */}
+                    <DesignCustomizer
+                      settings={designSettings}
+                      onSettingsChange={setDesignSettings}
                     />
                     
                     <Separator className="my-6" />
                     
-                    {/* Template Selector */}
+                    {/* Quick Template Selector */}
                     <TemplateSelector 
                       currentTemplate={templateStyle}
                       onTemplateChange={(template) => setTemplateStyle(template as any)}
@@ -881,27 +896,12 @@ const CVBuilder = () => {
                     
                     <Separator className="my-6" />
                     
-                    {/* Spacing Controls */}
-                    <SpacingControls 
-                      settings={spacingSettings}
-                      onSettingsChange={setSpacingSettings}
-                      onReset={() => setSpacingSettings({
-                        pageMargin: 32,
-                        sectionSpacing: 24,
-                        itemSpacing: 16,
-                        lineHeight: 1.5,
-                        headerPadding: 16,
-                        contentPadding: 16,
-                        borderRadius: 8,
-                        fontSize: 14
-                      })}
-                    />
-                    
-                    <Separator className="my-6" />
-                    
                     {/* Spell Checker */}
                     <div className="space-y-4">
-                      <h4 className="text-md font-semibold">Vérification orthographique</h4>
+                      <h4 className="text-md font-semibold flex items-center">
+                        <Edit3 className="h-5 w-5 mr-2 text-primary" />
+                        Vérification orthographique
+                      </h4>
                       <SpellChecker 
                         text={`${cvData.fullName} ${cvData.summary} ${cvData.experience.map(exp => `${exp.title} ${exp.description}`).join(' ')} ${cvData.education.map(edu => `${edu.degree} ${edu.description}`).join(' ')}`}
                         onCorrectedText={(correctedText) => {

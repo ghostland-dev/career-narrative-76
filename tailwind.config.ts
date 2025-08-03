@@ -76,6 +76,12 @@ export default {
 				'garamond': ['EB Garamond', 'Times', 'serif'],
 				'inter': ['Inter', 'sans-serif'],
 				'playfair': ['Playfair Display', 'serif'],
+				'montserrat': ['Montserrat', 'sans-serif'],
+				'roboto': ['Roboto', 'sans-serif'],
+				'open-sans': ['Open Sans', 'sans-serif'],
+				'lato': ['Lato', 'sans-serif'],
+				'source-sans': ['Source Sans Pro', 'sans-serif'],
+				'merriweather': ['Merriweather', 'serif'],
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
