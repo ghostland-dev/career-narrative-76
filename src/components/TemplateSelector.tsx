@@ -1,11 +1,14 @@
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Palette, Briefcase, Sparkles, Monitor, Award, Crown, Zap, FileText } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Palette, Briefcase, Sparkles, Monitor, Award, Crown, Zap, FileText, Wand2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface TemplateSelectorProps {
   currentTemplate: string;
   onTemplateChange: (template: string) => void;
+  compact?: boolean;
 }
 
 const templates = [
@@ -77,8 +80,56 @@ const templates = [
 
 const TemplateSelector: React.FC<TemplateSelectorProps> = ({
   currentTemplate,
-  onTemplateChange
+  onTemplateChange,
+  compact = false
 }) => {
+  const { toast } = useToast();
+
+  const handleTemplateChange = (templateId: string) => {
+    onTemplateChange(templateId);
+    toast({
+      title: "Design appliqué !",
+      description: `Le style "${templates.find(t => t.id === templateId)?.name}" a été appliqué à votre CV.`,
+      duration: 2000,
+    });
+  };
+
+  // Mode compact pour la barre d'outils
+  if (compact) {
+    return (
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          <Wand2 className="h-4 w-4 text-primary" />
+          <span className="text-sm font-medium">Changement rapide de design</span>
+        </div>
+        
+        <div className="flex flex-wrap gap-2">
+          {templates.map((template) => (
+            <Button
+              key={template.id}
+              variant={currentTemplate === template.id ? "default" : "outline"}
+              size="sm"
+              onClick={() => handleTemplateChange(template.id)}
+              className={`relative transition-all duration-300 hover:scale-105 ${
+                currentTemplate === template.id 
+                  ? "bg-gradient-to-r from-primary to-primary-glow shadow-glow" 
+                  : "hover:bg-primary/10"
+              }`}
+            >
+              <div className={template.color}>
+                {template.icon}
+              </div>
+              <span className="ml-2 text-xs">{template.name}</span>
+              {currentTemplate === template.id && (
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-success rounded-full border-2 border-background animate-pulse" />
+              )}
+            </Button>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2 mb-4">
@@ -93,36 +144,45 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({
         {templates.map((template) => (
           <Card
             key={template.id}
-            className={`cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg ${
+            className={`cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-elegant group ${
               currentTemplate === template.id
-                ? "ring-2 ring-primary shadow-lg"
-                : "hover:ring-1 hover:ring-primary/50"
+                ? "ring-2 ring-primary shadow-glow bg-gradient-to-br from-card to-primary/5"
+                : "hover:ring-1 hover:ring-primary/50 hover:shadow-card"
             }`}
-            onClick={() => onTemplateChange(template.id)}
+            onClick={() => handleTemplateChange(template.id)}
           >
             <CardContent className="p-3">
               <div className="space-y-2">
-                {/* Aperçu visuel */}
-                <div className="h-12 w-full rounded-md flex items-center justify-center relative overflow-hidden">
-                  <div className={`absolute inset-0 ${template.preview}`} />
-                  <div className={`relative z-10 ${template.color}`}>
+                {/* Aperçu visuel amélioré */}
+                <div className="h-12 w-full rounded-md flex items-center justify-center relative overflow-hidden group-hover:scale-110 transition-transform duration-300">
+                  <div className={`absolute inset-0 ${template.preview} group-hover:opacity-80`} />
+                  <div className={`relative z-10 ${template.color} group-hover:scale-110 transition-transform duration-300`}>
                     {template.icon}
                   </div>
+                  
+                  {/* Effet de clic */}
+                  {currentTemplate === template.id && (
+                    <div className="absolute inset-0 bg-primary/20 animate-pulse rounded-md" />
+                  )}
                 </div>
                 
                 {/* Nom du template */}
                 <div className="text-center">
-                  <p className="font-medium text-sm">{template.name}</p>
+                  <p className={`font-medium text-sm transition-colors ${
+                    currentTemplate === template.id ? "text-primary" : "group-hover:text-primary"
+                  }`}>
+                    {template.name}
+                  </p>
                   <p className="text-xs text-muted-foreground line-clamp-2">
                     {template.description}
                   </p>
                 </div>
                 
-                {/* Indicateur de sélection */}
+                {/* Indicateur de sélection amélioré */}
                 {currentTemplate === template.id && (
                   <div className="flex justify-center">
-                    <Badge variant="default" className="text-xs">
-                      Sélectionné
+                    <Badge variant="default" className="text-xs bg-gradient-to-r from-primary to-primary-glow animate-pulse">
+                      ✓ Appliqué
                     </Badge>
                   </div>
                 )}
@@ -132,7 +192,8 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({
         ))}
       </div>
       
-      <div className="text-xs text-muted-foreground text-center mt-4">
+      <div className="text-xs text-muted-foreground text-center mt-4 bg-card/50 rounded-lg p-3 border border-border/50">
+        <Wand2 className="h-4 w-4 inline mr-2 text-primary" />
         Cliquez sur un style pour l'appliquer instantanément à votre CV
       </div>
     </div>

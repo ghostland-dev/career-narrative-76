@@ -941,10 +941,23 @@ const CVBuilder = () => {
         <div className="mt-12">
           <Card className="border-0 shadow-modern">
             <div className="p-6">
-              <h3 className="text-lg font-semibold mb-4 flex items-center">
-                <Eye className="h-5 w-5 mr-2 text-primary" />
-                Aperçu du CV (Format A4)
-              </h3>
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-semibold flex items-center">
+                  <Eye className="h-5 w-5 mr-2 text-primary" />
+                  Aperçu du CV (Format A4)
+                </h3>
+                
+                {/* Barre d'outils flottante pour changement rapide */}
+                <div className="flex items-center space-x-3">
+                  <div className="bg-card/90 backdrop-blur-sm border border-border/50 rounded-xl p-3 shadow-elegant">
+                    <TemplateSelector 
+                      currentTemplate={templateStyle}
+                      onTemplateChange={(template) => setTemplateStyle(template as any)}
+                      compact={true}
+                    />
+                  </div>
+                </div>
+              </div>
               <div id="cv-preview" className="overflow-hidden rounded-lg border">
                 <CVDisplay
                   personalInfo={{
