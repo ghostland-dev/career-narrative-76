@@ -1,5 +1,7 @@
 # CVCraft
 
+[![CI](https://github.com/ghostland-dev/cvcraft/actions/workflows/ci.yml/badge.svg)](https://github.com/ghostland-dev/cvcraft/actions/workflows/ci.yml)
+
 Professional CV builder with templates and PDF export.
 
 ## Features
